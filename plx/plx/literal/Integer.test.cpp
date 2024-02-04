@@ -10,7 +10,10 @@ namespace PLX {
     class Integer_Test : public PlxTestFixture {};
 
     TEST_F(Integer_Test, CreateInstance) {
-        EXPECT_TRUE(false);
+        Integer* i100 = new Integer(100);
+        EXPECT_TRUE(i100->isA(TypeId::L_INTEGER));
+        EXPECT_EQ("Integer", i100->typeName());
+        EXPECT_EQ(100, i100->value());
     }
     
     TEST_F(Integer_Test, Equals) {

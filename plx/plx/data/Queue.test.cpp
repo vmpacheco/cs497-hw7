@@ -5,6 +5,7 @@
 #include <plx/data/Array.hpp>
 #include <plx/data/List.hpp>
 #include <plx/data/Queue.hpp>
+#include <plx/evaluator/Evaluator.hpp>
 #include <plx/expr/Identifier.hpp>
 #include <plx/literal/Integer.hpp>
 #include <plx/literal/Nil.hpp>
@@ -92,6 +93,33 @@ namespace PLX {
         q2->enq(i200);
         EXPECT_TRUE(q1->equals(q2));
         EXPECT_TRUE(q2->equals(q1));
+    }
+
+    TEST_F(Queue_Test, Eval) {
+        Identifier* x = Identifier::create("x");
+        Identifier* y = Identifier::create("y");
+        Identifier* z = Identifier::create("z");
+        Integer* i100 = new Integer(100);
+        Integer* i200 = new Integer(200);
+        Integer* i300 = new Integer(300);
+        Evaluator* etor = new Evaluator();
+        etor->bind(x, i100);
+        etor->bind(y, i200);
+        etor->bind(z, i300);
+        Queue* q1 = new Queue();
+        q1->enq(x);
+        q1->enq(y);
+        q1->enq(z);
+        Object* value = etor->evalExpr(q1);
+        EXPECT_TRUE(value->isA(TypeId::D_QUEUE));
+        Queue* queueValue = static_cast<Queue*>(value);
+        Object* elem = queueValue->deq();
+        EXPECT_EQ(*i100, *elem);
+        elem = queueValue->deq();
+        EXPECT_EQ(*i200, *elem);
+        elem = queueValue->deq();
+        EXPECT_EQ(*i300, *elem);
+        EXPECT_THROW(queueValue->deq(), Array*);
     }
 
     TEST_F(Queue_Test, IsEmpty) {

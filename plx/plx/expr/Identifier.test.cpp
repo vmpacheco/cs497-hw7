@@ -4,6 +4,7 @@
 
 #include <plx/data/HashTable.hpp>
 #include <plx/data/Triple.hpp>
+#include <plx/evaluator/Evaluator.hpp>
 #include <plx/expr/Identifier.hpp>
 #include <plx/literal/Integer.hpp>
 #include <plx/object/TypeIds.hpp>
@@ -18,7 +19,6 @@ namespace PLX {
         EXPECT_EQ("Identifier", identifier1->typeName());
         Identifier* identifier2 = Identifier::create("Abc");
         // This asserts that both identifiers are the same object
-        std::cerr << "Identifier_Test " << (void*)identifier1 << ", " << (void*)identifier2 << "\n";
         ASSERT_EQ(identifier1, identifier2);
         HashCode hashCode1;
         EXPECT_TRUE(identifier1->hashCode(hashCode1));
@@ -33,6 +33,25 @@ namespace PLX {
         EXPECT_NE(hashCode1, hashCode3);
         EXPECT_NE(hashCode2, hashCode3);
     }
+
+#if 0
+    TEST_F(Identifier_Test, Eval) {
+        Evaluator* etor = new Evaluator();
+        Identifier* abc = Identifier::create("abc");
+        Integer* i100 = new Integer(100);
+        etor->bind(abc, i100);
+        Object* value = abc->eval(etor);
+        EXPECT_EQ(i100, value);
+    }
+#endif
+
+#if 0
+    TEST_F(Identifier_Test, EvalUnbound) {
+        Evaluator* etor = new Evaluator();
+        Identifier* abc = Identifier::create("abc");
+        EXPECT_THROW(abc->eval(etor), Array*);
+    }
+#endif
 
     TEST_F(Identifier_Test, ShowOn) {
         {

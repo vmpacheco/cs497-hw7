@@ -4,6 +4,7 @@
 
 #include <plx/data/Array.hpp>
 #include <plx/data/HashTable.hpp>
+#include <plx/evaluator/Evaluator.hpp>
 #include <plx/expr/Identifier.hpp>
 #include <plx/literal/Integer.hpp>
 #include <plx/literal/String.hpp>
@@ -78,6 +79,64 @@ namespace PLX {
         EXPECT_TRUE(hash2->equals(hash1));
     }
 
+    TEST_F(HashTable_Test, Eval) {
+        // bind some names to values
+        Identifier* x = Identifier::create("x");
+        Identifier* y = Identifier::create("y");
+        Identifier* z = Identifier::create("z");
+        Integer* i100 = new Integer(100);
+        Integer* i200 = new Integer(200);
+        Integer* i300 = new Integer(300);
+        Evaluator* etor = new Evaluator();
+        etor->bind(x, i100);
+        etor->bind(y, i200);
+        etor->bind(z, i300);
+        Identifier* a = Identifier::create("a");
+        Identifier* b = Identifier::create("b");
+        Identifier* c = Identifier::create("c");
+        String* A = new String("A");
+        String* B = new String("B");
+        String* C = new String("C");
+        etor->bind(a, A);
+        etor->bind(b, B);
+        etor->bind(c, C);
+        // create the list to test
+        HashTable* hash1 = new HashTable();
+        hash1->put(a, x);
+        hash1->put(b, y);
+        hash1->put(c, z);
+        // evaluate the list
+        Object* resObj = etor->evalExpr(hash1);
+        ASSERT_TRUE(resObj->isA(TypeId::D_HASHTABLE));
+        HashTable* resHash = static_cast<HashTable*>(resObj);
+        Object* obj;
+        ASSERT_TRUE(resHash->get(A, obj));
+        EXPECT_EQ(i100, obj);
+        ASSERT_TRUE(resHash->get(B, obj));
+        EXPECT_EQ(i200, obj);
+        ASSERT_TRUE(resHash->get(C, obj));
+        EXPECT_EQ(i300, obj);
+    }
+
+    TEST_F(HashTable_Test, EvalUnboundIdentifier) {
+        String* abc = new String("abc");
+        Identifier* x = Identifier::create("x");
+        {
+            // the key is an unbound idetifier
+            HashTable* hash1 = new HashTable();
+            hash1->put(x, abc);
+            Evaluator* etor = new Evaluator();
+            EXPECT_THROW(etor->evalExpr(hash1), Array*);
+        }
+        {
+            // the value is an unbound idetifier
+            HashTable* hash1 = new HashTable();
+            hash1->put(abc, x);
+            Evaluator* etor = new Evaluator();
+            EXPECT_THROW(etor->evalExpr(hash1), Array*);
+        }
+    }
+
     TEST_F(HashTable_Test, HashCodes) {
         HashTable* hash1 = new HashTable();
         String* abc_1 = new String("abc");
@@ -130,7 +189,6 @@ namespace PLX {
         EXPECT_FALSE(hash1->index(new Integer(3), value));
     }
 
-#if 0
     TEST_F(HashTable_Test, Keys) {
         HashTable* hash1 = new HashTable();
         String* abc = new String("abc");
@@ -148,7 +206,6 @@ namespace PLX {
         EXPECT_TRUE(key1->equals(abc) || key1->equals(def));
         EXPECT_TRUE(key2->equals(abc) || key2->equals(def));
     }
-#endif
 
     TEST_F(HashTable_Test, ShowOn) {
         {

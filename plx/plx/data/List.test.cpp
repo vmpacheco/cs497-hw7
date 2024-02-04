@@ -6,6 +6,7 @@
 #include <plx/data/List.hpp>
 #include <plx/data/Queue.hpp>
 #include <plx/data/Triple.hpp>
+#include <plx/evaluator/Evaluator.hpp>
 #include <plx/expr/Identifier.hpp>
 #include <plx/literal/Integer.hpp>
 #include <plx/literal/Nil.hpp>
@@ -51,6 +52,22 @@ namespace PLX {
         List* list3 = new List(i200);
         EXPECT_FALSE(list3->equals(list1));
         EXPECT_FALSE(list1->equals(list3));
+    }
+
+    TEST_F(List_Test, Eval) {
+        Identifier* x = Identifier::create("x");
+        Identifier* y = Identifier::create("y");
+        Integer* i100 = new Integer(100);
+        Integer* i200 = new Integer(200);
+        Evaluator* etor = new Evaluator();
+        etor->bind(x, i100);
+        etor->bind(y, i200);
+        List* list1 = new List(x, new List(y));
+        Object* value = etor->evalExpr(list1);
+        ASSERT_TRUE(value->isA(TypeId::D_LIST));
+        List* listValue = static_cast<List*>(value);
+        List* expectedList = new List(i100, new List(i200));
+        EXPECT_TRUE(expectedList->equals(listValue));
     }
 
     TEST_F(List_Test, HashCode) {

@@ -25,12 +25,14 @@ namespace PLX {
     Array::Array(std::initializer_list<Object*> elems)
         : Array(elems.size())
     {
-        // TODO
+        int n=0;
+        for (Object* elem : elems) {
+            set(n++, elem);
+        }
     }
 
     bool Array::boolValue() const {
-        // TODO
-        return false;
+        return _elems.size() > 0;
     }
 
     bool Array::equals(const Object* other) const {
@@ -41,19 +43,31 @@ namespace PLX {
             return false;
         }
         const Array* otherArray = static_cast<const Array*>(other);
-        // TODO
-        return false;
+        if (_elems.size() != otherArray->_elems.size()) {
+            return false;
+        }
+        // Simple comparison of internal vectors, like this:
+        // _elems == otherArray->_elems;
+        // doesn't work. The elements must be compared one at a time.
+        for (std::vector<Object*>::size_type n=0; n<_elems.size(); n++) {
+            if (!_elems[n]->equals(otherArray->_elems[n])) {
+                return false;
+            }
+        }
+        return true;
     }
 
     bool Array::get(int index, Object*& value) {
         if (index < 0 || index >= static_cast<int>(_elems.size())) {
-            throwException("Array",
-                "Index out of range",
-                new Array({new Integer(index), this})
-            );
+            value = new Array({
+                new String("Array index out of bounds"),
+                new Integer(index),
+                this
+            });
+            return false;
         }
-        // TODO
-        return false;
+        value = _elems[index];
+        return true;
     }
 
     bool Array::hashCode(HashCode& hashCode) {
@@ -77,9 +91,11 @@ namespace PLX {
         }
         Integer* indexerInt = static_cast<Integer*>(indexer);
         int n = indexerInt->value();
-        if (!get(n, retrievedValue)) {
-            throw retrievedValue;
+        if (n < 0 || n >= static_cast<int>(_elems.size())) {
+            throwException("Array", "Index out of range", 
+                new Array({indexerInt, this}));
         }
+        retrievedValue = _elems[n];
         return true;
     }
 
@@ -90,16 +106,16 @@ namespace PLX {
     }
 
     bool Array::length(int& len) {
-        // TODO
-        return false;
+        len = _elems.size();
+        return true;
     }
 
     bool Array::set(int index, Object* newElem) {
         if (index < 0 || index >= static_cast<int>(_elems.size())) {
             return false;
         }
-        // TODO
-        return false;
+        _elems[index] = newElem;
+        return true;
     }
 
     void Array::showOn(std::ostream& ostream) const {

@@ -68,7 +68,7 @@ namespace PLX {
         len = _string.length();
         return true;
     }
-    
+
     Queue* String::split(String* delimiter) {
         Queue* tokens = new Queue();
         size_t start = 0, end = 0;
@@ -124,7 +124,7 @@ namespace PLX {
         std::string subStr = _string.substr(startPos, nChars);
         return new String(subStr);
     }
-    
+
     TypeId String::typeId() const {
         return TypeId::L_STRING;
     }

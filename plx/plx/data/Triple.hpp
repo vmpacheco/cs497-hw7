@@ -20,6 +20,7 @@ namespace PLX {
         void setNext(Triple* next);
         Triple* locate(const Object* key);
         bool lookup(const Object* key, Object*& value);
+        bool matchLocate(Object* object, Object*& value, Triple*& env);
         void showOnWith(std::ostream& ostream, const std::string& separator) const;
 
         // Overridden functions --------------------------------------------

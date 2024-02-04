@@ -6,6 +6,7 @@
 #include <plx/data/List.hpp>
 #include <plx/data/Queue.hpp>
 #include <plx/data/Triple.hpp>
+#include <plx/evaluator/Evaluator.hpp>
 #include <plx/expr/Identifier.hpp>
 #include <plx/literal/Integer.hpp>
 #include <plx/literal/Nil.hpp>
@@ -16,7 +17,6 @@ namespace PLX {
 
     class Array_Test : public PlxTestFixture {};
 
-#if 0
     TEST_F(Array_Test, CreateInstance) {
         Array* a3 = new Array(3);
         EXPECT_TRUE(a3->isA(TypeId::D_ARRAY));
@@ -28,9 +28,7 @@ namespace PLX {
             EXPECT_EQ(GLOBALS->NilObject(), elem);
         }
     }
-#endif
 
-#if 0
     TEST_F(Array_Test, CreateFromList) {
         Integer* i100 = new Integer(100);
         Integer* i200 = new Integer(200);
@@ -45,18 +43,14 @@ namespace PLX {
         EXPECT_TRUE(a3->get(2, elem));
         EXPECT_EQ(i300, elem);
     }
-#endif
 
-#if 0
     TEST_F(Array_Test, BoolValue) {
         Array* a0 = new Array(0);
         Array* a1 = new Array(1);
         EXPECT_FALSE(a0->boolValue());
         EXPECT_TRUE(a1->boolValue());
     }
-#endif
 
-#if 0
     TEST_F(Array_Test, Equals) {
         Array* a3a = new Array(3);
         Array* a3b = new Array(3);
@@ -72,9 +66,34 @@ namespace PLX {
         EXPECT_FALSE(a3c->equals(a4));
         EXPECT_NE(*a3c, *a4);
     }
-#endif
 
-#if 0
+    TEST_F(Array_Test, Eval) {
+        Identifier* x = Identifier::create("x");
+        Identifier* y = Identifier::create("y");
+        Identifier* z = Identifier::create("z");
+        Integer* i100 = new Integer(100);
+        Integer* i200 = new Integer(200);
+        Integer* i300 = new Integer(300);
+        Evaluator* etor = new Evaluator();
+        etor->bind(x, i100);
+        etor->bind(y, i200);
+        etor->bind(z, i300);
+        Array* array1 = new Array({x, y, z});
+        Object* resObj = etor->evalExpr(array1);
+        ASSERT_TRUE(resObj->isA(TypeId::D_ARRAY));
+        Array* resArray = static_cast<Array*>(resObj);
+        Array* expectedArray = new Array({i100, i200, i300});
+        EXPECT_EQ(*expectedArray, *resArray);
+    }
+
+    TEST_F(Array_Test, EvalUnboundIdentifier) {
+        Identifier* x = Identifier::create("x");
+        Array* array1 = new Array({x});
+        Evaluator* etor = new Evaluator();
+        // check that the value is an error array
+        EXPECT_THROW(etor->evalExpr(array1), Array*);
+    }
+
     TEST_F(Array_Test, HashCode) {
         Integer* i100_1 = new Integer(100);
         Integer* i100_2 = new Integer(100);
@@ -93,9 +112,7 @@ namespace PLX {
         EXPECT_NE(hashCode1, hashCode3);
         EXPECT_NE(hashCode2, hashCode3);
     }
-#endif
 
-#if 0
     TEST_F(Array_Test, Index) {
         Integer* i100 = new Integer(100);
         Integer* i200 = new Integer(200);
@@ -111,9 +128,7 @@ namespace PLX {
         EXPECT_THROW(a3->index(new Integer(-1), value), Array*);
         EXPECT_THROW(a3->index(new Integer(3), value), Array*);
     }
-#endif
 
-#if 0
     TEST_F(Array_Test, Length) {
         Array* a0 = new Array(0);
         Array* a1 = new Array(1);
@@ -122,35 +137,36 @@ namespace PLX {
         EXPECT_EQ(1, a1->length());
         EXPECT_EQ(2, a2->length());
     }
-#endif
 
-#if 0
     TEST_F(Array_Test, SetGet) {
         Integer* i100 = new Integer(100);
         Integer* i200 = new Integer(200);
         Integer* i300 = new Integer(300);
         Array* a3 = new Array({i100, i200, i300});
         Object* elem;
-        EXPECT_THROW(a3->get(-1, elem), Array*);
+        EXPECT_FALSE(a3->get(-1, elem));
         EXPECT_TRUE(a3->get(0, elem));
         EXPECT_EQ(i100, elem);
         EXPECT_TRUE(a3->get(1, elem));
         EXPECT_EQ(i200, elem);
         EXPECT_TRUE(a3->get(2, elem));
         EXPECT_EQ(i300, elem);
-        EXPECT_THROW(a3->get(3, elem), Array*);
+        EXPECT_FALSE(a3->get(3, elem));
     }
-#endif
 
-#if 0
     TEST_F(Array_Test, GetOutOfBounds) {
         Array* array = new Array(0);
-        Object* value = nullptr;
-        EXPECT_THROW(array->get(0, value), Array*);
+        Object* value;
+        EXPECT_FALSE(array->get(0, value));
+        // check that the value is an error array
+        EXPECT_TRUE(value->isA(TypeId::D_ARRAY));
+        Array* errorArray = static_cast<Array*>(value);
+        EXPECT_EQ(3, errorArray->length());
+        Object* elem;
+        EXPECT_TRUE(errorArray->get(0, elem));
+        EXPECT_TRUE(elem->isA(TypeId::L_STRING));
     }
-#endif
 
-#if 0
     TEST_F(Array_Test, ShowOn) {
         {
             std::stringstream ss;
@@ -176,9 +192,7 @@ namespace PLX {
             EXPECT_EQ("{nil, nil}", ss.str());
         }
     }
-#endif
 
-#if 0
     TEST_F(Array_Test, ToList) {
         Integer* i100 = new Integer(100);
         Integer* i200 = new Integer(200);
@@ -189,9 +203,7 @@ namespace PLX {
         List* expectedList = List::create({i100, i200, i300});
         EXPECT_EQ(*expectedList, *list1);
     }
-#endif
 
-#if 0
     TEST_F(Array_Test, ToQueue) {
         Integer* i100 = new Integer(100);
         Integer* i200 = new Integer(200);
@@ -202,6 +214,5 @@ namespace PLX {
         Queue* expectedQueue = new Queue({i100, i200, i300});
         EXPECT_EQ(*expectedQueue, *queue1);
     }
-#endif
 
 }

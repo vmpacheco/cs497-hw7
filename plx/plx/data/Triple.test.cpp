@@ -4,6 +4,7 @@
 
 #include <plx/data/Array.hpp>
 #include <plx/data/Triple.hpp>
+#include <plx/evaluator/Evaluator.hpp>
 #include <plx/expr/Identifier.hpp>
 #include <plx/literal/Integer.hpp>
 #include <plx/literal/Nil.hpp>
@@ -45,6 +46,28 @@ namespace PLX {
         EXPECT_FALSE(triple1->equals(triple2));
         Triple* triple3 = new Triple(abc, i100, triple1);
         EXPECT_TRUE(triple3->equals(triple2));
+    }
+
+    TEST_F(Triple_Test, Eval) {
+        Identifier* a = Identifier::create("a");
+        Identifier* b = Identifier::create("b");
+        Identifier* c = Identifier::create("c");
+        Identifier* d = Identifier::create("d");
+        Integer* i100 = new Integer(100);
+        Integer* i200 = new Integer(200);
+        Integer* i300 = new Integer(300);
+        Integer* i400 = new Integer(400);
+        Evaluator* etor = new Evaluator();
+        etor->bind(a, i100);
+        etor->bind(b, i200);
+        etor->bind(c, i300);
+        etor->bind(d, i400);
+        Triple* triple1 = new Triple(a, b, new Triple(c, d));
+        Object* value = etor->evalExpr(triple1);
+        EXPECT_TRUE(value->isA(TypeId::D_TRIPLE));
+        Triple* tripleValue = static_cast<Triple*>(value);
+        Triple* expectedTriple = new Triple(i100, i200, new Triple(i300, i400));
+        EXPECT_TRUE(expectedTriple->equals(tripleValue));
     }
 
     TEST_F(Triple_Test, IsEmpty) {

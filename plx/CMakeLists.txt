@@ -51,6 +51,7 @@ set(LIB_SRC_FILES
     plx/data/List.cpp
     plx/data/Queue.cpp
     plx/data/Triple.cpp
+    plx/evaluator/Evaluator.cpp
     plx/expr/Identifier.cpp
     plx/literal/Boolean.cpp
     plx/literal/Integer.cpp
@@ -71,6 +72,7 @@ set(TEST_SRC_FILES
     plx/data/List.test.cpp
     plx/data/Queue.test.cpp
     plx/data/Triple.test.cpp
+    plx/evaluator/Evaluator.test.cpp
     plx/expr/Identifier.test.cpp
     plx/literal/Boolean.test.cpp
     plx/literal/Integer.test.cpp

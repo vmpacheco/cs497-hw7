@@ -27,6 +27,7 @@ namespace PLX {
         virtual bool boolValue() const;
         virtual void displayOn(std::ostream& ostream) const;
         virtual bool equals(const Object* other) const;
+        virtual Object* eval(Evaluator* etor);
         virtual bool hashCode(HashCode& hashCode);
         virtual bool index(Object* indexer, Object*& retrievedValue);
         virtual bool length(int& len);
@@ -54,6 +55,7 @@ namespace PLX {
     // This operator can't be a member function because the first
     // parameter is an ostream and not an Object.
     std::ostream& operator<<(std::ostream& ostream, const PLX::Object* object);
+    std::ostream& operator<<(std::ostream& ostream, const PLX::Object& object);
 
 }
 

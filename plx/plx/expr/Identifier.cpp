@@ -2,6 +2,7 @@
 #include <plx/data/HashTable.hpp>
 #include <plx/data/List.hpp>
 #include <plx/data/Triple.hpp>
+#include <plx/evaluator/Evaluator.hpp>
 #include <plx/expr/Identifier.hpp>
 #include <plx/literal/Nil.hpp>
 #include <plx/literal/String.hpp>

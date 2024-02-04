@@ -22,6 +22,11 @@ namespace PLX {
         return ostream;
     }
 
+    std::ostream& operator<<(std::ostream& ostream, const PLX::Object& object) {
+        object.showOn(ostream);
+        return ostream;
+    }
+    
     bool Object::operator==(const Object& rhs) const {
         return this->equals(&rhs);
     }
@@ -51,6 +56,12 @@ namespace PLX {
         const void* thisPtr = static_cast<const void*>(this);
         const void* otherPtr = static_cast<const void*>(other);
         return thisPtr == otherPtr;
+    }
+
+    Object* Object::eval(Evaluator* etor) {
+        (void)etor;
+        // by default an object evaluates to itself
+        return this;
     }
 
     bool Object::hashCode(HashCode& hashCode) {

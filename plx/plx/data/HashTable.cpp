@@ -14,10 +14,12 @@ namespace PLX {
     HashTable::HashTable() {}
 
     bool HashTable::boolValue() const {
+        // return _nBindings != 0;
         return _map.size() != 0;
     }
 
     int HashTable::count() const {
+        // return _nBindings;
         return _map.size();
     }
 
