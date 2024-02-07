@@ -47,6 +47,7 @@ namespace PLX {
         bool operator==(const Object& rhs) const;
         bool operator==(const Object* other) const;
         bool operator!=(const Object& rhs) const;
+        bool operator!=(const Object* rhs) const;
 
     private:
 

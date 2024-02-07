@@ -39,6 +39,10 @@ namespace PLX {
         return !this->equals(&rhs);
     }
 
+    bool Object::operator!=(const Object* rhs) const {
+        return !this->equals(rhs);
+    }
+
     Object::Object() {
     }
 
