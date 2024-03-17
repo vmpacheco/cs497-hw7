@@ -5,12 +5,14 @@
 #include <plx/literal/String.hpp>
 #include <plx/object/ThrowException.hpp>
 #include <plx/object/TypeIds.hpp>
+#include <plx/prim/DefinePrims.hpp>
 
 namespace PLX {
 
-    extern bool globalDebug;
-    
+    bool globalEvaluatorDebug = false;
+
     Evaluator::Evaluator() {
+        definePrims(this);
     }
 
     Triple* Evaluator::bind(Object* key, Object* value) {
@@ -23,6 +25,11 @@ namespace PLX {
     }
 
     Object* Evaluator::evalExpr(Object* expr) {
+        // TODO this is where you can add instrumentation (i.e. print things)
+        // or check for a Trampoline.
+        if (globalEvaluatorDebug) {
+            std::clog << "Evaluator::evalExpr " << expr << " :: " << expr->typeName() << '\n';
+        }
         return expr->eval(this);
     }
 

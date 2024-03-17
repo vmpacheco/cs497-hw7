@@ -30,8 +30,21 @@ namespace PLX {
     }
 
     Identifier::Identifier(const std::string& name)
-        : Symbolic(name)
+        : Symbolic(name, TypeId::E_IDENTIFIER)
     {}
+
+    Object* Identifier::eval(Evaluator* etor) {
+        return etor->lookup(this);
+    }
+
+    List* Identifier::freeVars(List* freeVars) {
+        return new List(this, freeVars);
+    }
+
+    bool Identifier::match(Object* other, Triple*& bindings) {
+        bindings = new Triple(this, other, bindings);
+        return true;
+    }
 
     TypeId Identifier::typeId() const {
         return TypeId::E_IDENTIFIER;

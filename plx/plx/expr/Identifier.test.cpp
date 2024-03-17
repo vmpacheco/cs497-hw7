@@ -34,24 +34,31 @@ namespace PLX {
         EXPECT_NE(hashCode2, hashCode3);
     }
 
-#if 0
     TEST_F(Identifier_Test, Eval) {
         Evaluator* etor = new Evaluator();
         Identifier* abc = Identifier::create("abc");
         Integer* i100 = new Integer(100);
         etor->bind(abc, i100);
-        Object* value = abc->eval(etor);
+        Object* value = etor->evalExpr(abc);
         EXPECT_EQ(i100, value);
     }
-#endif
 
-#if 0
     TEST_F(Identifier_Test, EvalUnbound) {
         Evaluator* etor = new Evaluator();
         Identifier* abc = Identifier::create("abc");
-        EXPECT_THROW(abc->eval(etor), Array*);
+        EXPECT_THROW(etor->evalExpr(abc), Array*);
     }
-#endif
+
+    TEST_F(Identifier_Test, Match) {
+        Identifier* abc = Identifier::create("abc");
+        Integer* i100 = new Integer(100);
+        Triple* bindings = GLOBALS->EmptyTriple();
+        EXPECT_TRUE(abc->match(i100, bindings));
+        EXPECT_FALSE(bindings->isEmpty());
+        EXPECT_EQ(abc, bindings->key());
+        EXPECT_EQ(i100, bindings->value());
+        EXPECT_TRUE(bindings->next()->isEmpty());
+    }
 
     TEST_F(Identifier_Test, ShowOn) {
         {

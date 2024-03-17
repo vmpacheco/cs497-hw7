@@ -25,9 +25,10 @@ namespace PLX {
         // Overridden functions --------------------------------------------
 
         TypeId typeId() const override;
-    
+
     private:
         Triple* _environment {GLOBALS->EmptyTriple()};
+        void _definePrims();
 
     };
 

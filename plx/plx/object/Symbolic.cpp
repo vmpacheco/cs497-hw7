@@ -4,15 +4,15 @@
 
 namespace PLX {
 
-    static HashCode _calculateHashCode(const std::string& name) {
-        static const int typeHashCode = std::hash<int>{}(static_cast<int>(TypeId::L_SYMBOL));
+    static HashCode _calculateHashCode(const std::string& name, TypeId typeId) {
+        static const int typeHashCode = std::hash<int>{}(static_cast<int>(typeId));
         static const std::hash<std::string> stringHasher;
         return typeHashCode ^ (stringHasher(name) << 1);
     }
 
-    Symbolic::Symbolic(const std::string& name)
+    Symbolic::Symbolic(const std::string& name, TypeId typeId)
         : _name {name}
-        , _hashCode {_calculateHashCode(name)}
+        , _hashCode {_calculateHashCode(name, typeId)}
     {}
 
     bool Symbolic::hashCode(HashCode& hashCode) {

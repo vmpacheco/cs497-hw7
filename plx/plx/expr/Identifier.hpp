@@ -13,6 +13,9 @@ namespace PLX {
 
         // Overridden functions --------------------------------------------
 
+        Object* eval(Evaluator* etor) override;
+        List* freeVars(List* freeVars) override;
+        bool match(Object* other, Triple*& bindings) override;
         TypeId typeId() const override;
 
     private:

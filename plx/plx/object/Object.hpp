@@ -21,16 +21,22 @@ namespace PLX {
 
     class Object {
     public:
+        static void setGC(GC* gc);
+
         Object();
         virtual ~Object() = default;
 
+        virtual Object* apply(Evaluator* etor, List* arguments);
         virtual bool boolValue() const;
         virtual void displayOn(std::ostream& ostream) const;
         virtual bool equals(const Object* other) const;
         virtual Object* eval(Evaluator* etor);
+        virtual List* freeVars(List* freeVars);
+        static List* freeVars(std::initializer_list<Object*> objs, List* freeVars);
         virtual bool hashCode(HashCode& hashCode);
         virtual bool index(Object* indexer, Object*& retrievedValue);
         virtual bool length(int& len);
+        virtual bool match(Object* other, Triple*& bindings);
         virtual TypeId typeId() const;
 
         // type conversions
@@ -38,6 +44,13 @@ namespace PLX {
         virtual bool toArray(Array*& array);
         virtual bool toList(List*& list);
         virtual bool toQueue(Queue*& queue);
+
+        // operator support
+        virtual bool plus(Object* other, Object*& value);
+        virtual bool minus(Object* other, Object*& value);
+        virtual bool times(Object* other, Object*& value);
+        virtual bool divide(Object* other, Object*& value);
+        virtual bool percent(Object* other, Object*& value);
 
         bool isA(TypeId typeId) const;
         std::string toString();
@@ -50,6 +63,7 @@ namespace PLX {
         bool operator!=(const Object* rhs) const;
 
     private:
+        static GC* _gc;
 
     };
 
@@ -61,7 +75,9 @@ namespace PLX {
 }
 
 namespace std {
-    // The std::unordered_map class needs these two struct functions.
+
+    // The std::unordered_map class uses these functions.
+
     template <>
     struct hash<PLX::Object*> {
         size_t operator()(PLX::Object* obj) const {

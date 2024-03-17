@@ -69,6 +69,21 @@ namespace PLX {
         return true;
     }
 
+    bool String::plus(Object* other, Object*& value) {
+        if (other->isA(TypeId::L_STRING)) {
+            String* otherString = static_cast<String*>(other);
+            std::string newString {_string + otherString->_string};
+            value = new String(newString);
+        }
+        else {
+            std::stringstream ss;
+            ss << other;
+            std::string newString {_string + ss.str()};
+            value = new String(newString);
+        }
+        return true;
+    }
+    
     Queue* String::split(String* delimiter) {
         Queue* tokens = new Queue();
         size_t start = 0, end = 0;
@@ -125,6 +140,20 @@ namespace PLX {
         return new String(subStr);
     }
 
+    bool String::times(Object* other, Object*& value) {
+        if (!other->isA(TypeId::L_INTEGER)) {
+            return false;
+        }
+        Integer* otherInt = static_cast<Integer*>(other);
+        std::string newString {};
+        int n = otherInt->value();
+        while (n-- > 0) {
+            newString += _string;
+        }
+        value = new String(newString);
+        return true;
+    }
+    
     TypeId String::typeId() const {
         return TypeId::L_STRING;
     }

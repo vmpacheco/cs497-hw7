@@ -3,6 +3,7 @@
 #include <plx/data/HashTable.hpp>
 #include <plx/data/List.hpp>
 #include <plx/data/Triple.hpp>
+#include <plx/expr/Function.hpp>
 #include <plx/literal/Boolean.hpp>
 #include <plx/literal/Nil.hpp>
 #include <plx/literal/Symbol.hpp>
@@ -14,9 +15,11 @@ namespace PLX {
 
     Globals* GLOBALS;
 
-    Globals::Globals() {}
+    Globals::Globals()
+    {}
 
-    Globals::~Globals() {}
+    Globals::~Globals() {
+    }
 
     void Globals::initializeAll() {
         // Permanent objects -----------------------------------------------
@@ -50,6 +53,7 @@ namespace PLX {
 
     // Functions that return instances of things ---------------------------
 
+    Function*  Globals::EmptyFunction() { return _emptyFunction; }
     List*      Globals::EmptyList() { return _emptyList; }
     Triple*    Globals::EmptyTriple() { return _emptyTriple; }
     Boolean*   Globals::True() { return _true; }
@@ -60,6 +64,7 @@ namespace PLX {
     void       Globals::SetArgMap(HashTable* argMap) { _argMap = argMap; }
     HashTable* Globals::ArgMap() { return _argMap; }
     Triple*    Globals::DynamicEnvironment() { return _dynamicEnvironment; }
+    ReadEvalPrint* Globals::TheReadEvalPrint() { return _readEvalPrint; }
 
     Symbol*    Globals::BooleanSymbol() { return _booleanSymbol; }
     Symbol*    Globals::EoiSymbol() { return _eoiSymbol; }

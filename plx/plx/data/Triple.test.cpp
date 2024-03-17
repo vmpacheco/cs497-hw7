@@ -95,6 +95,48 @@ namespace PLX {
         EXPECT_THROW(triple1->setNext(GLOBALS->EmptyTriple()), Array*);
     }
 
+    TEST_F(Triple_Test, MatchLocate_Literals) {
+        Integer* i10 = new Integer(10);
+        Integer* i20 = new Integer(20);
+        Integer* i30 = new Integer(30);
+        Integer* i100 = new Integer(100);
+        Integer* i200 = new Integer(200);
+        Triple* triple1 = new Triple(i10, i100, new Triple(i20, i200));
+        Triple* env = GLOBALS->EmptyTriple();
+        Object* value;
+        ASSERT_TRUE(triple1->matchLocate(i10, value, env));
+        EXPECT_EQ(*i100, *value);
+        ASSERT_TRUE(triple1->matchLocate(i20, value, env));
+        EXPECT_EQ(*i200, *value);
+        ASSERT_FALSE(triple1->matchLocate(i30, value, env));
+    }
+
+    TEST_F(Triple_Test, MatchLocate_Identifiers) {
+        Identifier* x = Identifier::create("x");
+        Integer* i10 = new Integer(10);
+        Integer* i20 = new Integer(20);
+        Integer* i30 = new Integer(30);
+        Integer* i100 = new Integer(100);
+        Integer* i200 = new Integer(200);
+        Triple* triple1 = new Triple(x, i100, new Triple(i20, i200));
+        Triple* env = GLOBALS->EmptyTriple();
+        Object* value;
+        ASSERT_TRUE(triple1->matchLocate(i10, value, env));
+        EXPECT_EQ(*i100, *value);
+        ASSERT_TRUE(env->lookup(x, value));
+        EXPECT_EQ(*i10, *value);
+        env = GLOBALS->EmptyTriple();
+        ASSERT_TRUE(triple1->matchLocate(i20, value, env));
+        EXPECT_EQ(*i100, *value);
+        ASSERT_TRUE(env->lookup(x, value));
+        EXPECT_EQ(*i20, *value);
+        env = GLOBALS->EmptyTriple();
+        ASSERT_TRUE(triple1->matchLocate(i30, value, env));
+        EXPECT_EQ(*i100, *value);
+        ASSERT_TRUE(env->lookup(x, value));
+        EXPECT_EQ(*i30, *value);
+    }
+
     TEST_F(Triple_Test, ShowOn) {
         String* x = new String("x");
         Integer* i100 = new Integer(100);

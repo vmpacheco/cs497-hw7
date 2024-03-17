@@ -34,6 +34,9 @@ namespace PLX {
         void showOn(std::ostream& ostream) const override;
         TypeId typeId() const override;
 
+        bool plus(Object* other, Object*& value) override;
+        bool times(Object* other, Object*& value) override;
+
     private:
         std::string _string;
 

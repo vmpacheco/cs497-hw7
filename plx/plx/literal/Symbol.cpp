@@ -25,7 +25,7 @@ namespace PLX {
     }
 
     Symbol::Symbol(const std::string& name)
-        : Symbolic(name)
+        : Symbolic(name, TypeId::L_SYMBOL)
     {}
 
     TypeId Symbol::typeId() const {

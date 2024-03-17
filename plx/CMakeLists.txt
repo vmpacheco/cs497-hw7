@@ -21,12 +21,13 @@ set(AUTHOR "Jeff Meunier")
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_COMPILER "/usr/bin/clang++-14")  # requires '-gdwarf-4' compiler option
+#set(CMAKE_CXX_COMPILER "/usr/bin/g++")
 
 project(${PROJECT_NAME}
         VERSION      ${VERSION}
         DESCRIPTION  ${DESCRIPTION}
         HOMEPAGE_URL ${URL}
-        LANGUAGES    CXX)  # where CXX means C++
+        LANGUAGES    CXX)  # where CXX == C++
 
 message("compile options: " ${COMPILE_OPTIONS})
 include_directories("${CMAKE_CURRENT_LIST_DIR}")
@@ -34,8 +35,7 @@ set(EXECUTABLE_OUTPUT_PATH  ${PROJECT_SOURCE_DIR}/../bin)
 set(CMAKE_KEEP_TEST_OUTPUTS ON)
 
 # add_compile_options(-O0 -g -ggdb -Wall -Wextra -pedantic -Wswitch-enum -Werror -std=c++14)
-#add_compile_options(-O0 -g -ggdb -Wall -Wextra -pedantic -Werror -std=c++14 -gdwarf-4)
-add_compile_options(-O0 -g -ggdb -Wall -Wextra -pedantic -std=c++14 -gdwarf-4)
+add_compile_options(-O0 -g -ggdb -Wall -Wextra -pedantic -Werror -std=c++14 -gdwarf-4)
 
 #-----------------------------------------------------------------------
 # Source files
@@ -47,15 +47,30 @@ set(EXEC_SRC_FILES
 
 set(LIB_SRC_FILES
     plx/data/Array.cpp
+    plx/data/Closure.cpp
     plx/data/HashTable.cpp
     plx/data/List.cpp
     plx/data/Queue.cpp
     plx/data/Triple.cpp
     plx/evaluator/Evaluator.cpp
+    plx/expr/Apply.cpp
+    plx/expr/Do.cpp
+    plx/expr/Function.cpp
     plx/expr/Identifier.cpp
+    plx/expr/If.cpp
+    plx/expr/IndexOp.cpp
+    plx/expr/Let.cpp
+    plx/expr/LetIn.cpp
+    plx/expr/Match.cpp
+    plx/expr/ParenExpr.cpp
+    plx/expr/Quote.cpp
+    plx/expr/Throw.cpp
+    plx/expr/TryCatch.cpp
     plx/literal/Boolean.cpp
+    plx/literal/InputStream.cpp
     plx/literal/Integer.cpp
     plx/literal/Nil.cpp
+    plx/literal/PrimitiveFunction.cpp
     plx/literal/String.cpp
     plx/literal/Symbol.cpp
     plx/object/Globals.cpp
@@ -64,19 +79,43 @@ set(LIB_SRC_FILES
     plx/object/Symbolic.cpp
     plx/object/ThrowException.cpp
     plx/object/TypeIds.cpp
+    plx/prim/Array.cpp
+    plx/prim/Data.cpp
+    plx/prim/DefinePrims.cpp
+    plx/prim/Global.cpp
+    plx/prim/IO.cpp
+    plx/prim/HashTable.cpp
+    plx/prim/List.cpp
+    plx/prim/Operator.cpp
+    plx/prim/Primitive.cpp
+    plx/prim/Queue.cpp
 )
 
 set(TEST_SRC_FILES
     plx/data/Array.test.cpp
+    plx/data/Closure.test.cpp
     plx/data/HashTable.test.cpp
     plx/data/List.test.cpp
     plx/data/Queue.test.cpp
     plx/data/Triple.test.cpp
     plx/evaluator/Evaluator.test.cpp
+    plx/expr/Apply.test.cpp
+    plx/expr/Do.test.cpp
+    plx/expr/Function.test.cpp
     plx/expr/Identifier.test.cpp
+    plx/expr/If.test.cpp
+    plx/expr/Let.test.cpp
+    plx/expr/LetIn.test.cpp
+    plx/expr/Match.test.cpp
+    plx/expr/ParenExpr.test.cpp
+    plx/expr/Quote.test.cpp
+    plx/expr/Throw.test.cpp
+    plx/expr/TryCatch.test.cpp
     plx/literal/Boolean.test.cpp
+    plx/literal/InputStream.test.cpp
     plx/literal/Integer.test.cpp
     plx/literal/Nil.test.cpp
+    plx/literal/PrimitiveFunction.test.cpp
     plx/literal/String.test.cpp
     plx/literal/Symbol.test.cpp
     plx/object/Globals.test.cpp

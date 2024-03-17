@@ -3,6 +3,7 @@
 
 #include <plx/data/Array.hpp>
 #include <plx/data/Queue.hpp>
+#include <plx/evaluator/Evaluator.hpp>
 #include <plx/literal/Integer.hpp>
 #include <plx/literal/Nil.hpp>
 #include <plx/literal/String.hpp>
@@ -57,6 +58,24 @@ namespace PLX {
         return true;
     }
 
+    Object* Array::eval(Evaluator* etor) {
+        int nElems = _elems.size();
+        Array* newArray = new Array(nElems);
+        for (int n=0; n<nElems; n++) {
+            Object* elem = _elems[n];
+            Object* value = etor->evalExpr(elem);
+            newArray->set(n, value);
+        }
+        return newArray;
+    }
+
+    List* Array::freeVars(List* freeVars) {
+        for (Object* elem : _elems) {
+            freeVars = elem->freeVars(freeVars);
+        }
+        return freeVars;
+    }
+
     bool Array::get(int index, Object*& value) {
         if (index < 0 || index >= static_cast<int>(_elems.size())) {
             value = new Array({
@@ -107,6 +126,22 @@ namespace PLX {
 
     bool Array::length(int& len) {
         len = _elems.size();
+        return true;
+    }
+
+    bool Array::match(Object* other, Triple*& bindings) {
+        if (!other->isA(TypeId::D_ARRAY)) {
+            return false;
+        }
+        Array* otherArray = static_cast<Array*>(other);
+        if (otherArray->_elems.size() != _elems.size()) {
+            return false;
+        }
+        for (std::vector<Object*>::size_type n=0; n<_elems.size(); n++) {
+            if (!_elems[n]->match(otherArray->_elems[n], bindings)) {
+                return false;
+            }
+        }
         return true;
     }
 

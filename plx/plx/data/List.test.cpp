@@ -70,6 +70,20 @@ namespace PLX {
         EXPECT_TRUE(expectedList->equals(listValue));
     }
 
+    TEST_F(List_Test, FreeVars) {
+        Identifier* x = Identifier::create("x");
+        Identifier* y = Identifier::create("y");
+        Integer* i100 = new Integer(100);
+        List* list1 = List::create({x, i100, y});
+        List* freeVars = GLOBALS->EmptyList();
+        freeVars = list1->freeVars(freeVars);
+        int len;
+        ASSERT_TRUE(freeVars->length(len));
+        ASSERT_EQ(2, len);
+        EXPECT_EQ(y, freeVars->first());
+        EXPECT_EQ(x, freeVars->second());
+    }
+
     TEST_F(List_Test, HashCode) {
         List* p0 = GLOBALS->EmptyList();
         HashCode hashCode0;
@@ -111,6 +125,52 @@ namespace PLX {
         ASSERT_NE(GLOBALS->EmptyList(), list1->locate(i100));
         ASSERT_NE(GLOBALS->EmptyList(), list1->locate(i200));
         ASSERT_EQ(GLOBALS->EmptyList(), list1->locate(i300));
+    }
+
+    TEST_F(List_Test, Match) {
+        Identifier* x = Identifier::create("x");
+        Identifier* y = Identifier::create("y");
+        Integer* i100 = new Integer(100);
+        Integer* i200 = new Integer(200);
+        List* list1 = new List(i100, new List(i200));
+        List* list2 = new List(x, new List(y));
+        Triple* bindings = GLOBALS->EmptyTriple();
+        EXPECT_TRUE(list2->match(list1, bindings));
+        Object* value1;
+        EXPECT_TRUE(bindings->lookup(x, value1));
+        EXPECT_EQ(value1, i100);
+        Object* value2;
+        EXPECT_TRUE(bindings->lookup(y, value2));
+        EXPECT_EQ(value2, i200);
+    }
+
+    TEST_F(List_Test, Match_Improper) {
+        Identifier* x = Identifier::create("x");
+        Identifier* y = Identifier::create("y");
+        Integer* i100 = new Integer(100);
+        Integer* i200 = new Integer(200);
+        List* list1 = new List(i100, new List(i200));
+        List* list2 = new List(x, y);
+        Triple* bindings = GLOBALS->EmptyTriple();
+        EXPECT_TRUE(list2->match(list1, bindings));
+        Object* value1;
+        EXPECT_TRUE(bindings->lookup(x, value1));
+        EXPECT_EQ(value1, i100);
+        Object* value2;
+        EXPECT_TRUE(bindings->lookup(y, value2));
+        List* expectedList = new List(i200);
+        EXPECT_EQ(*value2, *expectedList);
+    }
+
+    TEST_F(List_Test, MatchFail) {
+        Identifier* x = Identifier::create("x");
+        Integer* i100 = new Integer(100);
+        Integer* i200 = new Integer(200);
+        Integer* i300 = new Integer(300);
+        List* list1 = new List(i100, new List(i200));
+        List* list2 = new List(x, new List(i300));
+        Triple* bindings = GLOBALS->EmptyTriple();
+        EXPECT_FALSE(list2->match(list1, bindings));
     }
 
     TEST_F(List_Test, Reverse_ProperList) {

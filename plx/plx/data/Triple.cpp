@@ -2,6 +2,7 @@
 
 #include <plx/data/Array.hpp>
 #include <plx/data/Triple.hpp>
+#include <plx/evaluator/Evaluator.hpp>
 #include <plx/literal/Nil.hpp>
 #include <plx/literal/String.hpp>
 #include <plx/object/Globals.hpp>
@@ -38,6 +39,18 @@ namespace PLX {
             return othertriple->isEmpty();
         }
         return _key->equals(othertriple->_key) && _value->equals(othertriple->_value);
+    }
+
+    Object* Triple::eval(Evaluator* etor) {
+        if (isEmpty()) {
+            return this;
+        }
+        Object* keyVal = etor->evalExpr(_key);
+        Object* valueVal = etor->evalExpr(_value);
+        Object* nextValObj = etor->evalExpr(_next);
+        assert(nextValObj->isA(TypeId::D_TRIPLE));
+        Triple* nextVal = static_cast<Triple*>(nextValObj);
+        return new Triple(keyVal, valueVal, nextVal);
     }
 
     bool Triple::isEmpty() const {
@@ -84,6 +97,18 @@ namespace PLX {
 
     Triple* Triple::next() const {
         return _next;
+    }
+
+    bool Triple::matchLocate(Object* object, Object*& value, Triple*& env) {
+        Triple* triple = this;
+        while (!triple->isEmpty()) {
+            if (triple->key()->match(object, env)) {
+                value = triple->value();
+                return true;
+            }
+            triple = triple->next();
+        }
+        return false; 
     }
 
     void Triple::setNext(Triple* next) {

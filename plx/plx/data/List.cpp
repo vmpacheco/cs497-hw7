@@ -4,6 +4,7 @@
 #include <plx/data/Array.hpp>
 #include <plx/data/List.hpp>
 #include <plx/data/Queue.hpp>
+#include <plx/evaluator/Evaluator.hpp> 
 #include <plx/literal/Nil.hpp>
 #include <plx/literal/String.hpp>
 #include <plx/object/Globals.hpp>
@@ -63,11 +64,35 @@ namespace PLX {
         return false;
     }
 
+    Object* List::eval(Evaluator* etor) {
+        if (isEmpty()) {
+            return this;
+        }
+        Object* firstValue = etor->evalExpr(_first);
+        Object* restValue = etor->evalExpr(_rest);
+        return new List(firstValue, restValue);
+    }
+
     Object* List::first() {
         if (isEmpty()) {
             throwException("List", "List is empty", this);
         }
         return _first;
+    }
+
+    List* List::freeVars(List* freeVars) {
+        List* list = this;
+        while (!list->isEmpty()) {
+            freeVars = list->_first->freeVars(freeVars);
+            if (_rest->isA(TypeId::D_LIST)) {
+                list = static_cast<List*>(list->_rest);
+            }
+            else {
+                list = list->_rest->freeVars(freeVars);
+                break;
+            }
+        }
+        return freeVars;
     }
 
     bool List::hashCode(HashCode& hashCode) {
@@ -159,6 +184,20 @@ namespace PLX {
             }
         }
         return reversed;
+    }
+
+    bool List::match(Object* other, Triple*& bindings) {
+        if (!other->isA(TypeId::D_LIST)) {
+            return false;
+        }
+        List* otherList = static_cast<List*>(other);
+        if (isEmpty()) {
+            return otherList->isEmpty();
+        }
+        if (!_first->match(otherList->_first, bindings)) {
+            return false;
+        }
+        return _rest->match(otherList->_rest, bindings);
     }
 
     Object* List::second() {

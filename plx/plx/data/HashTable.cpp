@@ -5,6 +5,7 @@
 #include <plx/data/HashTable.hpp>
 #include <plx/data/List.hpp>
 #include <plx/data/Triple.hpp>
+#include <plx/evaluator/Evaluator.hpp>
 #include <plx/object/Globals.hpp>
 #include <plx/object/HashCode.hpp>
 #include <plx/object/TypeIds.hpp>
@@ -43,6 +44,18 @@ namespace PLX {
             }
         }
         return true;
+    }
+
+    Object* HashTable::eval(Evaluator* etor) {
+        HashTable* newHash = new HashTable();
+        for (auto iter = _map.begin(); iter != _map.end(); iter++) {
+            Object* key = iter->first;
+            Object* value = iter->second;
+            Object* newKey = etor->evalExpr(key);
+            Object* newValue = etor->evalExpr(value);
+            newHash->put(newKey, newValue);
+        }
+        return newHash;
     }
 
     bool HashTable::get(Object* key, Object*& value) const {

@@ -6,6 +6,7 @@
 #include <plx/data/List.hpp>
 #include <plx/data/Queue.hpp>
 #include <plx/data/Triple.hpp>
+#include <plx/evaluator/Evaluator.hpp>
 #include <plx/literal/String.hpp>
 #include <plx/literal/Symbol.hpp>
 #include <plx/object/HashCode.hpp>
@@ -26,7 +27,10 @@ namespace PLX {
         object.showOn(ostream);
         return ostream;
     }
-    
+
+    // This is set to an actual value in Globals.
+    GC* Object::_gc = nullptr;
+
     bool Object::operator==(const Object& rhs) const {
         return this->equals(&rhs);
     }
@@ -39,11 +43,19 @@ namespace PLX {
         return !this->equals(&rhs);
     }
 
-    bool Object::operator!=(const Object* rhs) const {
-        return !this->equals(rhs);
+    void Object::setGC(GC* gc) {
+        Object::_gc = gc;
     }
 
-    Object::Object() {
+    Object::Object() {}
+
+    Object* Object::apply(Evaluator* etor, List* arguments) {
+        (void)etor;
+        (void)arguments;
+        throwException("Object::apply", "Object is not applyable", this);
+        // This function won't ever return anything, but by putting a
+        // return statement here it prevents a compiler warning.
+        return this;
     }
 
     bool Object::boolValue() const {
@@ -68,8 +80,20 @@ namespace PLX {
         return this;
     }
 
+    List* Object::freeVars(List* freeVars) {
+        return freeVars;
+    }
+
+    List* Object::freeVars(std::initializer_list<Object*> objs, List* freeVars) {
+        for (Object* obj : objs) {
+            freeVars = obj->freeVars(freeVars);
+        }
+        return freeVars;
+    }
+
     bool Object::hashCode(HashCode& hashCode) {
         (void)hashCode;
+        // void throwException(const std::string& category, const std::string& message, Object* payload);
         Array* payload = new Array({this, this->typeSymbol()});
         throwException("Object", "Object is not hashable", payload);
         return false;
@@ -87,6 +111,41 @@ namespace PLX {
 
     bool Object::length(int& len) {
         (void)len;
+        return false;
+    }
+
+    bool Object::match(Object* other, Triple*& bindings) {
+        (void)bindings;
+        return this->equals(other);
+    }
+
+    bool Object::plus(Object* other, Object*& value) {
+        (void)other;
+        (void)value;
+        return false;
+    }
+
+    bool Object::minus(Object* other, Object*& value) {
+        (void)other;
+        (void)value;
+        return false;
+    }
+
+    bool Object::times(Object* other, Object*& value) {
+        (void)other;
+        (void)value;
+        return false;
+    }
+
+    bool Object::divide(Object* other, Object*& value) {
+        (void)other;
+        (void)value;
+        return false;
+    }
+
+    bool Object::percent(Object* other, Object*& value) {
+        (void)other;
+        (void)value;
         return false;
     }
 
@@ -120,6 +179,7 @@ namespace PLX {
     }
 
     std::string Object::typeName() const {
+        // return "Object";
         return TYPE_NAMES[typeId()];
     }
 

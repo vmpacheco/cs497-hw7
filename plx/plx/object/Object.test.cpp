@@ -7,10 +7,8 @@ namespace PLX {
 
     class Object_Test : public ::testing::Test {
     public:
-        void SetUp() override {
-        }
-        void TearDown() override {
-        }
+        void SetUp() override {}
+        void TearDown() override {}
     private:
     };
 
@@ -28,7 +26,7 @@ namespace PLX {
         Object* obj2 = new Object();
         EXPECT_FALSE(*obj1 == *obj2);
         EXPECT_FALSE(*obj2 == *obj1);
-        EXPECT_EQ(*obj1, *obj1);  // this requires equals() to be a const function
+        EXPECT_EQ(*obj1, *obj1);  // this requires equals() to use const
     }
 
 }

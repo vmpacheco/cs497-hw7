@@ -46,7 +46,7 @@ namespace PLX {
         T_REPL,
         // The Z_ANY entry serves two purposes:
         // It's the array-size sentinel for HashCode,
-        // and it can be used as an indicator for "any type of value".
+        // and it's a way to type-check for any kind of value.
         Z_ANY
     };
 

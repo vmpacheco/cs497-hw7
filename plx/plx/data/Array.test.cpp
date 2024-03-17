@@ -94,6 +94,20 @@ namespace PLX {
         EXPECT_THROW(etor->evalExpr(array1), Array*);
     }
 
+    TEST_F(Array_Test, FreeVars) {
+        Identifier* x = Identifier::create("x");
+        Identifier* y = Identifier::create("y");
+        Integer* i100 = new Integer(100);
+        Array* array1 = new Array({x, i100, y});
+        List* freeVars = GLOBALS->EmptyList();
+        freeVars = array1->freeVars(freeVars);
+        int len;
+        ASSERT_TRUE(freeVars->length(len));
+        ASSERT_EQ(2, len);
+        EXPECT_EQ(y, freeVars->first());
+        EXPECT_EQ(x, freeVars->second());
+    }
+
     TEST_F(Array_Test, HashCode) {
         Integer* i100_1 = new Integer(100);
         Integer* i100_2 = new Integer(100);
@@ -136,6 +150,36 @@ namespace PLX {
         EXPECT_EQ(0, a0->length());
         EXPECT_EQ(1, a1->length());
         EXPECT_EQ(2, a2->length());
+    }
+
+    TEST_F(Array_Test, Match) {
+        Identifier* x = Identifier::create("x");
+        Identifier* y = Identifier::create("y");
+        Integer* i100 = new Integer(100);
+        Integer* i200 = new Integer(200);
+        Integer* i300 = new Integer(300);
+        Array* array1 = new Array({i100, i200, i300});
+        Array* array2 = new Array({x, i200, y});
+        Triple* bindings = GLOBALS->EmptyTriple();
+        EXPECT_TRUE(array2->match(array1, bindings));
+        Object* value1;
+        EXPECT_TRUE(bindings->lookup(x, value1));
+        EXPECT_EQ(value1, i100);
+        Object* value2;
+        EXPECT_TRUE(bindings->lookup(y, value2));
+        EXPECT_EQ(value2, i300);
+    }
+
+    TEST_F(Array_Test, MatchFail) {
+        Identifier* x = Identifier::create("x");
+        Identifier* y = Identifier::create("y");
+        Integer* i100 = new Integer(100);
+        Integer* i200 = new Integer(200);
+        Integer* i300 = new Integer(300);
+        Array* array1 = new Array({i100, i200, i300});
+        Array* array2 = new Array({x, i300, y});
+        Triple* bindings = GLOBALS->EmptyTriple();
+        EXPECT_FALSE(array2->match(array1, bindings));
     }
 
     TEST_F(Array_Test, SetGet) {

@@ -83,9 +83,11 @@ int main(int argc, char** argv) {
     PLX::GLOBALS->SetArgMap(argMap);
     if (!isatty(STDIN_FILENO)) {
         // std::cin is redirected, data comes from a file
+        // TODO read/eval/print text from the file
     }
     else {
-        // std::cin is not redirected, enter a REP loop
+        // std::cin is not redirected
+        // TODO instantiate and run a read/eval/print loop
     }
     shutdown();
     return 0;

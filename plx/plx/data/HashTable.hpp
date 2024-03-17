@@ -26,6 +26,7 @@ namespace PLX {
 
         bool boolValue() const override;
         bool equals(const Object* other) const override;
+        Object* eval(Evaluator* etor) override;
         bool index(Object* indexer, Object*& retrievedValue) override;
         bool length(int& len) override;
         void showOn(std::ostream& ostream) const override;
