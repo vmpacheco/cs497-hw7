@@ -152,6 +152,22 @@ namespace PLX {
         EXPECT_EQ(2, a2->length());
     }
 
+    TEST_F(Array_Test, MarkChildren) {
+        Integer* i100 = new Integer(100);
+        Integer* i200 = new Integer(200);
+        Integer* i300 = new Integer(300);
+        Array* a3 = new Array({i100, i200, i300});
+        EXPECT_FALSE(a3->isMarked());
+        EXPECT_FALSE(i100->isMarked());
+        EXPECT_FALSE(i200->isMarked());
+        EXPECT_FALSE(i300->isMarked());
+        a3->markChildren();
+        EXPECT_FALSE(a3->isMarked());
+        EXPECT_TRUE(i100->isMarked());
+        EXPECT_TRUE(i200->isMarked());
+        EXPECT_TRUE(i300->isMarked());
+    }
+
     TEST_F(Array_Test, Match) {
         Identifier* x = Identifier::create("x");
         Identifier* y = Identifier::create("y");

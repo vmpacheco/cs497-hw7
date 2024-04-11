@@ -1,6 +1,4 @@
 #include <plx/literal/Integer.hpp>
-#include <plx/object/Object.hpp>
-#include <plx/object/TypeIds.hpp>
 
 namespace PLX {
 

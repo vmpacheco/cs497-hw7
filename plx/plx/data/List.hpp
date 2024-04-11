@@ -39,6 +39,7 @@ namespace PLX {
         List* freeVars(List* freeVars) override;
         bool hashCode(HashCode& hashCode) override;
         bool length(int& len) override;
+        void markChildren() override;
         bool match(Object* other, Triple*& bindings) override;
         void showOn(std::ostream& ostream) const override;
         bool toArray(Array*& array) override;

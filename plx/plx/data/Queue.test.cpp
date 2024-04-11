@@ -95,7 +95,7 @@ namespace PLX {
         EXPECT_TRUE(q2->equals(q1));
     }
 
-    TEST_F(Queue_Test, Eval) {
+    TEST_F(Queue_Test, Eval_Evaluator) {
         Identifier* x = Identifier::create("x");
         Identifier* y = Identifier::create("y");
         Identifier* z = Identifier::create("z");
@@ -139,6 +139,22 @@ namespace PLX {
         Integer* i200 = new Integer(200);
         q1->enq(i200);
         EXPECT_EQ(2, q1->length());
+    }
+
+    TEST_F(Queue_Test, MarkChildren) {
+        Queue* q1 = new Queue();
+        Integer* i100 = new Integer(100);
+        Integer* i200 = new Integer(200);
+        q1->enq(i100);
+        q1->enq(i200);
+        EXPECT_FALSE(q1->isMarked());
+        EXPECT_FALSE(i100->isMarked());
+        EXPECT_FALSE(i200->isMarked());
+        q1->markChildren();
+        EXPECT_FALSE(q1->isMarked());
+        EXPECT_TRUE(q1->asList()->isMarked());
+        EXPECT_TRUE(i100->isMarked());
+        EXPECT_TRUE(i200->isMarked());
     }
 
     TEST_F(Queue_Test, ShowOn) {

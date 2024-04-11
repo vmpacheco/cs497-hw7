@@ -1,6 +1,4 @@
-#include <plx/literal/String.hpp>
 #include <plx/object/Symbolic.hpp>
-#include <plx/object/TypeIds.hpp>
 
 namespace PLX {
 

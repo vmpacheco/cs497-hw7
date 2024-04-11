@@ -1,14 +1,9 @@
 #include <cassert>
 
-#include <plx/data/Array.hpp>
 #include <plx/data/Triple.hpp>
 #include <plx/evaluator/Evaluator.hpp>
 #include <plx/literal/Nil.hpp>
-#include <plx/literal/String.hpp>
-#include <plx/object/Globals.hpp>
-#include <plx/object/Object.hpp>
 #include <plx/object/ThrowException.hpp>
-#include <plx/object/TypeIds.hpp>
 
 namespace PLX {
 
@@ -97,6 +92,12 @@ namespace PLX {
 
     Triple* Triple::next() const {
         return _next;
+    }
+
+    void Triple::markChildren() {
+        _key->mark();
+        _value->mark();
+        _next->mark();
     }
 
     bool Triple::matchLocate(Object* object, Object*& value, Triple*& env) {

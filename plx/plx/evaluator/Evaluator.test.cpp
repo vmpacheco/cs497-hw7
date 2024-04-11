@@ -68,6 +68,19 @@ namespace PLX {
         EXPECT_EQ(env1, testObject->env);
     }
 
+    TEST_F(Evaluator_Test, MarkChildren) {
+        String* key = new String("abc");
+        Integer* value = new Integer(100);
+        _etor->bind(key, value);
+        EXPECT_FALSE(_etor->isMarked());
+        EXPECT_FALSE(key->isMarked());
+        EXPECT_FALSE(value->isMarked());
+        _etor->markChildren();
+        EXPECT_FALSE(_etor->isMarked());
+        EXPECT_TRUE(key->isMarked());
+        EXPECT_TRUE(value->isMarked());
+    }
+
     TEST_F(Evaluator_Test, SetEnvironment) {
         Triple* env = new Triple(Identifier::create("x"), new Integer(100));
         _etor->setEnvironment(env);

@@ -1,13 +1,6 @@
-#include <cassert>
-
-#include <plx/data/List.hpp>
-#include <plx/data/Triple.hpp>
 #include <plx/evaluator/Evaluator.hpp>
-#include <plx/expr/Do.hpp>
 #include <plx/expr/Let.hpp>
 #include <plx/expr/LetIn.hpp>
-#include <plx/object/Globals.hpp>
-#include <plx/object/TypeIds.hpp>
 
 namespace PLX {
 
@@ -22,6 +15,11 @@ namespace PLX {
         Object* value = etor->evalExpr(_body);
         etor->setEnvironment(savedEnv);
         return value;
+    }
+
+    void LetIn::markChildren() {
+        _let->mark();
+        _body->mark();
     }
 
     void LetIn::showOn(std::ostream& ostream) const {

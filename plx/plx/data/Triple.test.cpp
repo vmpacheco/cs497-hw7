@@ -48,7 +48,7 @@ namespace PLX {
         EXPECT_TRUE(triple3->equals(triple2));
     }
 
-    TEST_F(Triple_Test, Eval) {
+    TEST_F(Triple_Test, Eval_Evaluator) {
         Identifier* a = Identifier::create("a");
         Identifier* b = Identifier::create("b");
         Identifier* c = Identifier::create("c");
@@ -93,6 +93,22 @@ namespace PLX {
         Triple* triple1 = GLOBALS->EmptyTriple();
         EXPECT_THROW(triple1->setValue(GLOBALS->NilObject()), Array*);
         EXPECT_THROW(triple1->setNext(GLOBALS->EmptyTriple()), Array*);
+    }
+
+    TEST_F(Triple_Test, MarkChildren) {
+        Triple* triple1 = new Triple();
+        String* abc = new String("abc");
+        Integer* i100 = new Integer(100);
+        Triple* triple2 = new Triple(abc, i100, triple1);
+        EXPECT_FALSE(triple2->isMarked());
+        EXPECT_FALSE(abc->isMarked());
+        EXPECT_FALSE(i100->isMarked());
+        EXPECT_FALSE(triple1->isMarked());
+        triple2->markChildren();
+        EXPECT_FALSE(triple2->isMarked());
+        EXPECT_TRUE(abc->isMarked());
+        EXPECT_TRUE(i100->isMarked());
+        EXPECT_TRUE(triple1->isMarked());
     }
 
     TEST_F(Triple_Test, MatchLocate_Literals) {

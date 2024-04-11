@@ -11,6 +11,7 @@ namespace PLX {
         Globals* savedGlobals = GLOBALS;
         GLOBALS = new Globals();
         GLOBALS->initializeAll();
+        EXPECT_NE(nullptr, GLOBALS->Gc());
         EXPECT_NE(nullptr, GLOBALS->NilObject());
         delete GLOBALS;
         GLOBALS = savedGlobals;

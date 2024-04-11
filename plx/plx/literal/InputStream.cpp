@@ -1,7 +1,6 @@
 #include <plx/data/Array.hpp>
 #include <plx/literal/InputStream.hpp>
 #include <plx/literal/Integer.hpp>
-#include <plx/object/TypeIds.hpp>
 
 namespace PLX{
 

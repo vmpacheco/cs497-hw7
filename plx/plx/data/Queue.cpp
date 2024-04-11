@@ -1,15 +1,9 @@
-#include <cassert>
 #include <list>
 
-#include <plx/data/Array.hpp>
 #include <plx/data/List.hpp>
 #include <plx/data/Queue.hpp>
 #include <plx/evaluator/Evaluator.hpp>
-#include <plx/literal/String.hpp>
-#include <plx/object/Globals.hpp>
-#include <plx/object/Object.hpp>
 #include <plx/object/ThrowException.hpp>
-#include <plx/object/TypeIds.hpp>
 
 namespace PLX {
 
@@ -94,6 +88,10 @@ namespace PLX {
     bool Queue::length(int& len) {
         len = _nElems;
         return true;
+    }
+
+    void Queue::markChildren() {
+        _head->mark();
     }
 
     void Queue::showOn(std::ostream& ostream) const {

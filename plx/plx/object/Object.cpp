@@ -1,20 +1,10 @@
-#include <cassert>
 #include <list>
 #include <sstream>
 
 #include <plx/data/Array.hpp>
-#include <plx/data/List.hpp>
-#include <plx/data/Queue.hpp>
-#include <plx/data/Triple.hpp>
-#include <plx/evaluator/Evaluator.hpp>
-#include <plx/literal/String.hpp>
 #include <plx/literal/Symbol.hpp>
-#include <plx/object/HashCode.hpp>
 #include <plx/object/Object.hpp>
 #include <plx/object/ThrowException.hpp>
-#include <plx/object/TypeIds.hpp>
-
-#include <unordered_map>
 
 namespace PLX {
 
@@ -22,14 +12,6 @@ namespace PLX {
         object->showOn(ostream);
         return ostream;
     }
-
-    std::ostream& operator<<(std::ostream& ostream, const PLX::Object& object) {
-        object.showOn(ostream);
-        return ostream;
-    }
-
-    // This is set to an actual value in Globals.
-    GC* Object::_gc = nullptr;
 
     bool Object::operator==(const Object& rhs) const {
         return this->equals(&rhs);
@@ -43,11 +25,8 @@ namespace PLX {
         return !this->equals(&rhs);
     }
 
-    void Object::setGC(GC* gc) {
-        Object::_gc = gc;
+    Object::Object() {
     }
-
-    Object::Object() {}
 
     Object* Object::apply(Evaluator* etor, List* arguments) {
         (void)etor;
@@ -109,15 +88,28 @@ namespace PLX {
         return (this->typeId()) == typeId;
     }
 
+    bool Object::isMarked() const {
+        return _isMarked;
+    }
+
     bool Object::length(int& len) {
         (void)len;
         return false;
+    }
+
+    void Object::mark() {
+        if (!_isMarked) {
+            _isMarked = true;
+            markChildren();
+        }
     }
 
     bool Object::match(Object* other, Triple*& bindings) {
         (void)bindings;
         return this->equals(other);
     }
+
+    void Object::markChildren() {}
 
     bool Object::plus(Object* other, Object*& value) {
         (void)other;
@@ -185,6 +177,10 @@ namespace PLX {
 
     Symbol* Object::typeSymbol() const {
         return Symbol::create(typeName());
+    }
+
+    void Object::unmark() {
+        _isMarked = false;
     }
 
 }

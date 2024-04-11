@@ -17,12 +17,22 @@ namespace PLX {
         EXPECT_EQ("Quote", quote1->typeName());
     }
 
-    TEST_F(Quote_Test, Eval) {
+    TEST_F(Quote_Test, Eval_Evaluator) {
         Evaluator* etor = new Evaluator();
         Identifier* x = Identifier::create("x");
         Quote* quote = new Quote(x);
         Object* resObj = etor->evalExpr(quote);
         EXPECT_EQ(x, resObj);
+    }
+
+    TEST_F(Quote_Test, MarkChildren) {
+        Identifier* x = Identifier::create("x");
+        Quote* quote = new Quote(x);
+        EXPECT_FALSE(quote->isMarked());
+        EXPECT_FALSE(x->isMarked());
+        quote->markChildren();
+        EXPECT_FALSE(quote->isMarked());
+        EXPECT_TRUE(x->isMarked());
     }
 
     TEST_F(Quote_Test, ShowOn) {

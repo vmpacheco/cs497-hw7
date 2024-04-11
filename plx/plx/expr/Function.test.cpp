@@ -15,7 +15,6 @@
 
 namespace PLX {
 
-#if 0
     class Function_Test : public PlxTestFixture {};
 
     TEST_F(Function_Test, CreateInstance) {
@@ -26,7 +25,7 @@ namespace PLX {
         EXPECT_EQ("Function", fun1->typeName());
     }
 
-    TEST_F(Function_Test, Eval) {
+    TEST_F(Function_Test, Eval_Evaluator) {
         Identifier* x = Identifier::create("x");
         Identifier* y = Identifier::create("y");
         Integer* i100 = new Integer(100);
@@ -47,6 +46,23 @@ namespace PLX {
         EXPECT_TRUE(value2->equals(expectedArray));
     }
 
+    TEST_F(Function_Test, MarkChildren) {
+        Identifier* x = Identifier::create("x");
+        Identifier* y = Identifier::create("y");
+        List* parameters = new List(x);
+        Object* body = y;
+        Function* fun1 = new Function(parameters, body);
+        EXPECT_FALSE(fun1->isMarked());
+        EXPECT_FALSE(x->isMarked());
+        EXPECT_FALSE(y->isMarked());
+        EXPECT_FALSE(parameters->isMarked());
+        fun1->markChildren();
+        EXPECT_FALSE(fun1->isMarked());
+        EXPECT_TRUE(x->isMarked());
+        EXPECT_TRUE(y->isMarked());
+        EXPECT_TRUE(parameters->isMarked());
+    }
+
     TEST_F(Function_Test, ShowOn) {
         Identifier* x = Identifier::create("x");
         Identifier* y = Identifier::create("y");
@@ -57,6 +73,29 @@ namespace PLX {
         ss << fun1;
         EXPECT_EQ("fun (x) = y", ss.str());
     }
-#endif
+
+    TEST_F(Function_Test, MatchArgumentsToParameters) {
+        Integer* i10 = new Integer(10);
+        Integer* i20 = new Integer(20);
+        Integer* i30 = new Integer(30);
+        Integer* i100 = new Integer(100);
+        Integer* i200 = new Integer(200);
+        List* paramList1 = List::create({i10});
+        Object* body1 = i100;
+        List* paramList2 = List::create({i20});
+        Object* body2 = i200;
+        Function* function1 = new Function(paramList1, body1);
+        Function* function2 = new Function(paramList2, body2);
+        function1->setNext(function2);
+        Triple* lexicalEnv = GLOBALS->EmptyTriple();
+        List* argList1 = List::create({i10});
+        Object* bodyRes1 = function1->matchArgumentsToParameters(argList1, lexicalEnv);
+        EXPECT_EQ(*body1, *bodyRes1);
+        List* argList2 = List::create({i20});
+        Object* bodyRes2 = function1->matchArgumentsToParameters(argList2, lexicalEnv);
+        EXPECT_EQ(*body2, *bodyRes2);
+        List* argList3 = List::create({i30});
+        EXPECT_THROW(function1->matchArgumentsToParameters(argList3, lexicalEnv), Array*);
+    }
 
 }

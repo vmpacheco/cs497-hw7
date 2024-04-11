@@ -1,8 +1,5 @@
-#include <cassert>
-
 #include <plx/evaluator/Evaluator.hpp>
 #include <plx/expr/If.hpp>
-#include <plx/object/TypeIds.hpp>
 
 namespace PLX {
 
@@ -17,6 +14,12 @@ namespace PLX {
         return condRes->boolValue()
              ? etor->evalExpr(_conseq)
              : etor->evalExpr(_alt);
+    }
+
+    void If::markChildren() {
+        _cond->mark();
+        _conseq->mark();
+        _alt->mark();
     }
 
     void If::showOn(std::ostream& ostream) const {

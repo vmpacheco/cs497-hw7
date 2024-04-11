@@ -1,13 +1,7 @@
-#include <cassert>
-
-#include <plx/data/Array.hpp>
-#include <plx/data/List.hpp>
 #include <plx/data/Triple.hpp>
 #include <plx/evaluator/Evaluator.hpp>
 #include <plx/expr/TryCatch.hpp>
 #include <plx/literal/Nil.hpp>
-#include <plx/object/Globals.hpp>
-#include <plx/object/TypeIds.hpp>
 
 namespace PLX {
 
@@ -43,6 +37,12 @@ namespace PLX {
             throw rethrowException;
         }
         return value;
+    }
+
+    void TryCatch::markChildren() {
+        _expr->mark();
+        _catchRules->mark();
+        _finally->mark();
     }
 
     void TryCatch::showOn(std::ostream& ostream) const {

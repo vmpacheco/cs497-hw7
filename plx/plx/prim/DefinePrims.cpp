@@ -21,6 +21,7 @@ namespace PLX {
         definePrim(etor, "argMap", Prim_Global::argMap);
         definePrim(etor, "eval", Prim_Global::eval);
         definePrim(etor, "not", Prim_Global::notOperator);
+        definePrim(etor, "repl", Prim_Global::repl);
         definePrim(etor, "type", Prim_Global::type);
         // Array
         definePrim(etor, "get", Prim_Array::get);
@@ -51,7 +52,7 @@ namespace PLX {
         definePrim(etor, "-", Prim_Operator::minus);
         definePrim(etor, "*", Prim_Operator::times);
         definePrim(etor, "/", Prim_Operator::divide);
-        // definePrim(etor, ".", Prim_Operator::dot);
+        definePrim(etor, ".", Prim_Operator::dot);
         definePrim(etor, "%", Prim_Operator::percent);
     }
 

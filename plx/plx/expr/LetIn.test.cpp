@@ -22,7 +22,7 @@ namespace PLX {
         EXPECT_EQ("LetIn", letIn1->typeName());
     }
 
-    TEST_F(LetIn_Test, Eval) {
+    TEST_F(LetIn_Test, Eval_Evaluator) {
         Identifier* x = Identifier::create("x");
         Integer* i100 = new Integer(100);
         LetIn* letIn1 = new LetIn(new Triple(x, i100), x);
@@ -32,12 +32,28 @@ namespace PLX {
         EXPECT_THROW(etor->lookup(x), Array*);
     }
 
-    TEST_F(LetIn_Test, Eval_MatchFailure) {
+    TEST_F(LetIn_Test, Eval_MatchFailure_Evaluator) {
         Evaluator* etor = new Evaluator();
         Integer* i100 = new Integer(100);
         Integer* i200 = new Integer(200);
         LetIn* letIn1 = new LetIn(new Triple(i100, i200), i100);
         EXPECT_THROW(etor->evalExpr(letIn1), Array*);
+    }
+
+    TEST_F(LetIn_Test, MarkChildren) {
+        Identifier* x = Identifier::create("x");
+        Identifier* y = Identifier::create("y");
+        Integer* i100 = new Integer(100);
+        LetIn* letIn1 = new LetIn(new Triple(x, i100), y);
+        EXPECT_FALSE(letIn1->isMarked());
+        EXPECT_FALSE(x->isMarked());
+        EXPECT_FALSE(y->isMarked());
+        EXPECT_FALSE(i100->isMarked());
+        letIn1->markChildren();
+        EXPECT_FALSE(letIn1->isMarked());
+        EXPECT_TRUE(x->isMarked());
+        EXPECT_TRUE(y->isMarked());
+        EXPECT_TRUE(i100->isMarked());
     }
 
     TEST_F(LetIn_Test, ShowOn) {

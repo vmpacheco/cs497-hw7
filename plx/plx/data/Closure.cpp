@@ -1,26 +1,42 @@
 #include <cassert>
 
-#include <plx/data/Array.hpp>
 #include <plx/data/Closure.hpp>
 #include <plx/data/List.hpp>
 #include <plx/data/Triple.hpp>
 #include <plx/evaluator/Evaluator.hpp>
 #include <plx/expr/Function.hpp>
-#include <plx/literal/Nil.hpp>
-#include <plx/literal/String.hpp>
-#include <plx/object/Globals.hpp>
-#include <plx/object/TypeIds.hpp>
 
 namespace PLX {
 
+    Closure::Closure(Function* function, Triple* lexicalEnvironment, bool isMacro)
+        : _function {function}
+        , _lexicalEnvironment {lexicalEnvironment}
+        , _isMacro {isMacro}
+    {}
+
     Object* Closure::apply(Evaluator* etor, List* arguments) {
-        (void)etor;
-        (void)arguments;
-        return GLOBALS->NilObject();
+        List* argValues;
+        if (_isMacro) {
+            argValues = arguments;
+        }
+        else {
+            Object* argValueObj = etor->evalExpr(arguments);
+            assert(argValueObj->isA(TypeId::D_LIST));
+            argValues = static_cast<List*>(argValueObj);
+        }
+        Triple* newEnvironment = _lexicalEnvironment;
+        Object* body = _function->matchArgumentsToParameters(argValues, newEnvironment);
+        Object* value = etor->evalExpr(body, newEnvironment);
+        return value;
+    }
+
+    void Closure::markChildren() {
+        _function->mark();
+        _lexicalEnvironment->mark();
     }
 
     void Closure::showOn(std::ostream& ostream) const {
-        (void)ostream;
+        ostream << _function;
     }
 
     TypeId Closure::typeId() const {

@@ -18,12 +18,22 @@ namespace PLX {
         EXPECT_EQ("ParenExpr", parenExpr->typeName());
     }
 
-    TEST_F(ParenExpr_Test, Eval) {
+    TEST_F(ParenExpr_Test, Eval_Evaluator) {
         Evaluator* etor = new Evaluator();
         Integer* i123 = new Integer(123);
         ParenExpr* parenExpr = new ParenExpr(i123);
         Object* value = etor->evalExpr(parenExpr);
         EXPECT_EQ(*i123, *value);
+    }
+
+    TEST_F(ParenExpr_Test, MarkChildren) {
+        Integer* i123 = new Integer(123);
+        ParenExpr* parenExpr = new ParenExpr(i123);
+        EXPECT_FALSE(parenExpr->isMarked());
+        EXPECT_FALSE(i123->isMarked());
+        parenExpr->markChildren();
+        EXPECT_FALSE(parenExpr->isMarked());
+        EXPECT_TRUE(i123->isMarked());
     }
 
     TEST_F(ParenExpr_Test, ShowOn) {

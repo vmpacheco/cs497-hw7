@@ -19,7 +19,7 @@ namespace PLX {
         EXPECT_EQ("IfThen", if1->typeName());
     }
 
-    TEST_F(If_Test, Eval_True) {
+    TEST_F(If_Test, Eval_True_Evaluator) {
         Evaluator* etor = new Evaluator();
         Integer* i100 = new Integer(100);
         Integer* i200 = new Integer(200);
@@ -28,13 +28,29 @@ namespace PLX {
         EXPECT_EQ(i100, resObj);
     }
 
-    TEST_F(If_Test, Eval_False) {
+    TEST_F(If_Test, Eval_False_Evaluator) {
         Evaluator* etor = new Evaluator();
         Integer* i100 = new Integer(100);
         Integer* i200 = new Integer(200);
         If* if1 = new If(GLOBALS->False(), i100, i200);
         Object* resObj = etor->evalExpr(if1);
         EXPECT_EQ(i200, resObj);
+    }
+
+    TEST_F(If_Test, MarkChildren) {
+        Integer* i100 = new Integer(100);
+        Integer* i200 = new Integer(200);
+        Integer* i300 = new Integer(200);
+        If* if1 = new If(i100, i200, i300);
+        EXPECT_FALSE(if1->isMarked());
+        EXPECT_FALSE(i100->isMarked());
+        EXPECT_FALSE(i200->isMarked());
+        EXPECT_FALSE(i300->isMarked());
+        if1->markChildren();
+        EXPECT_FALSE(if1->isMarked());
+        EXPECT_TRUE(i100->isMarked());
+        EXPECT_TRUE(i200->isMarked());
+        EXPECT_TRUE(i300->isMarked());
     }
 
     TEST_F(If_Test, ShowOn) {

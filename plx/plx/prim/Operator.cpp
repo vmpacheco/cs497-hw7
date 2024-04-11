@@ -3,6 +3,7 @@
 #include <plx/data/Array.hpp>
 #include <plx/data/Closure.hpp>
 #include <plx/data/List.hpp>
+#include <plx/data/Method.hpp>
 #include <plx/data/Triple.hpp>
 #include <plx/evaluator/Evaluator.hpp>
 #include <plx/expr/Apply.hpp>
@@ -47,6 +48,21 @@ namespace PLX {
                 operationNotSupported(PRIM_NAME, lhs, rhs);
             }
             return value;
+        }
+
+        Object* dot(Evaluator* etor, List* args) {
+            (void)etor;
+            const std::string PRIM_NAME {"."};
+            int nArgs = args->length();
+            if (nArgs != 2) {
+                argumentCountMismatch(PRIM_NAME, 2, nArgs);
+            }
+            Object* lhs = args->first();
+            Object* rhs = args->second();
+            assert(rhs->typeId() == TypeId::E_IDENTIFIER);
+            Identifier* rhsIdent = static_cast<Identifier*>(rhs);
+            Method* method = new Method(lhs, rhsIdent);
+            return method;
         }
 
         Object* equalTo(Evaluator* etor, List* args) {

@@ -1,5 +1,3 @@
-#include <cassert>
-
 #include <plx/data/HashTable.hpp>
 #include <plx/data/List.hpp>
 #include <plx/data/Triple.hpp>
@@ -8,15 +6,13 @@
 #include <plx/literal/Nil.hpp>
 #include <plx/literal/Symbol.hpp>
 #include <plx/object/Globals.hpp>
-#include <plx/object/Object.hpp>
-#include <plx/object/TypeIds.hpp>
 
 namespace PLX {
 
     Globals* GLOBALS;
 
-    Globals::Globals()
-    {}
+    Globals::Globals() {
+    }
 
     Globals::~Globals() {
     }
@@ -28,6 +24,7 @@ namespace PLX {
         _false = new Boolean(false);
         _emptyList = new List();
         _emptyTriple = new Triple();
+        _emptyFunction = new Function();  // depends on _nil and _emptyList
         _dynamicEnvironment = new Triple();
 
         // Root objects ----------------------------------------------------
@@ -53,6 +50,7 @@ namespace PLX {
 
     // Functions that return instances of things ---------------------------
 
+    GC*        Globals::Gc() { return _gc; }
     Function*  Globals::EmptyFunction() { return _emptyFunction; }
     List*      Globals::EmptyList() { return _emptyList; }
     Triple*    Globals::EmptyTriple() { return _emptyTriple; }

@@ -1,4 +1,3 @@
-#include <cassert>
 #include <vector>
 
 #include <plx/data/Array.hpp>
@@ -8,10 +7,7 @@
 #include <plx/literal/Nil.hpp>
 #include <plx/literal/String.hpp>
 #include <plx/literal/Symbol.hpp>
-#include <plx/object/Globals.hpp>
-#include <plx/object/Object.hpp>
 #include <plx/object/ThrowException.hpp>
-#include <plx/object/TypeIds.hpp>
 
 namespace PLX {
 
@@ -127,6 +123,12 @@ namespace PLX {
     bool Array::length(int& len) {
         len = _elems.size();
         return true;
+    }
+
+    void Array::markChildren() {
+        for (Object* elem : _elems) {
+            elem->mark();
+        }
     }
 
     bool Array::match(Object* other, Triple*& bindings) {

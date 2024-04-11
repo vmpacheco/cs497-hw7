@@ -1,8 +1,5 @@
-#include <cassert>
-
 #include <plx/expr/Quote.hpp>
 #include <plx/evaluator/Evaluator.hpp>
-#include <plx/object/TypeIds.hpp>
 
 namespace PLX {
 
@@ -23,6 +20,10 @@ namespace PLX {
             return true;
         }
         return false;
+    }
+
+    void Quote::markChildren() {
+        _expr->mark();
     }
 
     void Quote::showOn(std::ostream& ostream) const {

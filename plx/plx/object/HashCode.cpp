@@ -1,7 +1,4 @@
-#include <cassert>
-
 #include <plx/object/HashCode.hpp>
-#include <plx/object/TypeIds.hpp>
 
 namespace PLX {
 

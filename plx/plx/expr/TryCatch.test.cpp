@@ -112,6 +112,24 @@ namespace PLX {
         EXPECT_EQ(1, stateChanger->state);
     }
 
+    TEST_F(TryCatch_Test, MarkChildren) {
+        Integer* i10 = new Integer(10);
+        Integer* i100 = new Integer(100);
+        String* finally = new String("finally");
+        Throw* throwExpr = new Throw(i10);
+        Triple* rules = new Triple(i10, i100);
+        TryCatch* tryCatch = new TryCatch(throwExpr, rules, finally);
+        EXPECT_FALSE(tryCatch->isMarked());
+        EXPECT_FALSE(throwExpr->isMarked());
+        EXPECT_FALSE(rules->isMarked());
+        EXPECT_FALSE(finally->isMarked());
+        tryCatch->markChildren();
+        EXPECT_FALSE(tryCatch->isMarked());
+        EXPECT_TRUE(throwExpr->isMarked());
+        EXPECT_TRUE(rules->isMarked());
+        EXPECT_TRUE(finally->isMarked());
+    }
+
     TEST_F(TryCatch_Test, ShowOn) {
         Integer* i10 = new Integer(10);
         Integer* i20 = new Integer(20);

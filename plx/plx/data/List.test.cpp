@@ -54,7 +54,7 @@ namespace PLX {
         EXPECT_FALSE(list1->equals(list3));
     }
 
-    TEST_F(List_Test, Eval) {
+    TEST_F(List_Test, Eval_Evaluator) {
         Identifier* x = Identifier::create("x");
         Identifier* y = Identifier::create("y");
         Integer* i100 = new Integer(100);
@@ -125,6 +125,22 @@ namespace PLX {
         ASSERT_NE(GLOBALS->EmptyList(), list1->locate(i100));
         ASSERT_NE(GLOBALS->EmptyList(), list1->locate(i200));
         ASSERT_EQ(GLOBALS->EmptyList(), list1->locate(i300));
+    }
+
+    TEST_F(List_Test, MarkChildren) {
+        Integer* i100 = new Integer(100);
+        Integer* i200 = new Integer(200);
+        List* list1 = new List(i100);
+        List* list2 = new List(i200, list1);
+        EXPECT_FALSE(list2->isMarked());
+        EXPECT_FALSE(list1->isMarked());
+        EXPECT_FALSE(i100->isMarked());
+        EXPECT_FALSE(i200->isMarked());
+        list2->markChildren();
+        EXPECT_FALSE(list2->isMarked());
+        EXPECT_TRUE(list1->isMarked());
+        EXPECT_TRUE(i100->isMarked());
+        EXPECT_TRUE(i200->isMarked());
     }
 
     TEST_F(List_Test, Match) {

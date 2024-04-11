@@ -31,6 +31,7 @@ namespace PLX {
         bool hashCode(HashCode& hashCode) override;
         bool index(Object* indexer, Object*& retrievedValue) override;
         bool length(int& len) override;
+        void markChildren() override;
         bool match(Object* other, Triple*& bindings) override;
         void showOn(std::ostream& ostream) const override;
         bool toArray(Array*& array) override;

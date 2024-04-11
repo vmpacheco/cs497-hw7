@@ -49,6 +49,10 @@ namespace PLX {
         return value;
     }
 
+    void Evaluator::markChildren() {
+        _environment->mark();
+    }
+
     bool Evaluator::rebind(Identifier* key, Object* value) {
         Triple* binding = _environment->locate(key);
         if (binding->isEmpty()) {

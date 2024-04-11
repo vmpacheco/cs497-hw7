@@ -6,12 +6,7 @@
 #include <plx/data/Queue.hpp>
 #include <plx/evaluator/Evaluator.hpp> 
 #include <plx/literal/Nil.hpp>
-#include <plx/literal/String.hpp>
-#include <plx/object/Globals.hpp>
-#include <plx/object/HashCode.hpp>
-#include <plx/object/Object.hpp>
 #include <plx/object/ThrowException.hpp>
-#include <plx/object/TypeIds.hpp>
 
 namespace PLX {
 
@@ -220,6 +215,11 @@ namespace PLX {
              throwException("List", "Operation not allowed on empty list", this);
         }
         _rest = rest;
+    }
+
+    void List::markChildren() {
+        _first->mark();
+        _rest->mark();
     }
 
     void List::showOn(std::ostream& ostream) const {

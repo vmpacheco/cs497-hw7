@@ -7,10 +7,7 @@
 #include <plx/expr/Identifier.hpp>
 #include <plx/expr/Let.hpp>
 #include <plx/literal/Nil.hpp>
-#include <plx/literal/String.hpp>
-#include <plx/object/Globals.hpp>
 #include <plx/object/ThrowException.hpp>
-#include <plx/object/TypeIds.hpp>
 
 namespace PLX {
 
@@ -54,6 +51,10 @@ namespace PLX {
             bindings = bindings->next();
         }
         return GLOBALS->NilObject();
+    }
+
+    void Let::markChildren() {
+        _bindings->mark();
     }
 
     void Let::showOn(std::ostream& ostream) const {

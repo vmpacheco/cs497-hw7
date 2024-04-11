@@ -61,6 +61,24 @@ namespace PLX {
         ASSERT_THROW(etor->evalExpr(match), Array*);
     }
 
+    TEST_F(Match_Test, MarkChildren) {
+        Integer* i10 = new Integer(10);
+        Integer* i20 = new Integer(20);
+        Integer* i30 = new Integer(30);
+        Integer* i100 = new Integer(100);
+        Integer* i200 = new Integer(200);
+        Object* expression = i30;
+        Triple* rules = new Triple(i10, i100, new Triple(i20, i200));
+        Match* match = new Match(expression, rules);
+        EXPECT_FALSE(match->isMarked());
+        EXPECT_FALSE(expression->isMarked());
+        EXPECT_FALSE(rules->isMarked());
+        match->markChildren();
+        EXPECT_FALSE(match->isMarked());
+        EXPECT_TRUE(expression->isMarked());
+        EXPECT_TRUE(rules->isMarked());
+    }
+
     TEST_F(Match_Test, ShowOn) {
         Integer* i10 = new Integer(10);
         Integer* i20 = new Integer(20);

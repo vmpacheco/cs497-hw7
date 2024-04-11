@@ -1,16 +1,8 @@
-#include <cassert>
-
 #include <plx/data/Array.hpp>
-#include <plx/data/Closure.hpp>
-#include <plx/data/List.hpp>
 #include <plx/data/Triple.hpp>
 #include <plx/evaluator/Evaluator.hpp>
 #include <plx/expr/Match.hpp>
-#include <plx/literal/Nil.hpp>
-#include <plx/literal/String.hpp>
-#include <plx/object/Globals.hpp>
 #include <plx/object/ThrowException.hpp>
-#include <plx/object/TypeIds.hpp>
 
 namespace PLX {
 
@@ -28,6 +20,11 @@ namespace PLX {
             throwException("Match::eval", "Argument mismatch", new Array({exprValue, this}));
         }
         return value;
+    }
+
+    void Match::markChildren() {
+        _expression->mark();
+        _rules->mark();
     }
 
     void Match::showOn(std::ostream& ostream) const {

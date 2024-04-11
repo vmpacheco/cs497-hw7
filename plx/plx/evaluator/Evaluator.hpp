@@ -24,12 +24,13 @@ namespace PLX {
 
         // Overridden functions --------------------------------------------
 
+        void markChildren() override;
         TypeId typeId() const override;
-
+    
     private:
         Triple* _environment {GLOBALS->EmptyTriple()};
         void _definePrims();
-
+    
     };
 
 }

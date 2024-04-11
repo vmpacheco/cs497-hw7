@@ -29,6 +29,7 @@ namespace PLX {
         bool equals(const Object* other) const override;
         Object* eval(Evaluator* etor) override;
         bool length(int& len) override;
+        void markChildren() override;
         void showOn(std::ostream& ostream) const override;
         TypeId typeId() const override;
 

@@ -1,10 +1,8 @@
 #include <plx/data/Array.hpp>
-#include <plx/data/List.hpp>
 #include <plx/evaluator/Evaluator.hpp>
 #include <plx/expr/IndexOp.hpp>
 #include <plx/literal/Symbol.hpp>
 #include <plx/object/ThrowException.hpp>
-#include <plx/object/TypeIds.hpp>
 
 namespace PLX {
 
@@ -22,6 +20,11 @@ namespace PLX {
                 new Array({collectionValue, collectionValue->typeSymbol()}));
         }
         return retrievedValue;
+    }
+
+    void IndexOp::markChildren() {
+        _collection->mark();
+        _index->mark();
     }
 
     void IndexOp::showOn(std::ostream& ostream) const {

@@ -1,10 +1,4 @@
-#include <cassert>
-#include <cstdint>
-
-#include <plx/data/List.hpp>
 #include <plx/literal/PrimitiveFunction.hpp>
-#include <plx/object/HashCode.hpp>
-#include <plx/object/TypeIds.hpp>
 
 namespace PLX {
 

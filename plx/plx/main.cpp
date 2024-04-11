@@ -6,10 +6,13 @@
 #include <plx/data/HashTable.hpp>
 #include <plx/data/List.hpp>
 #include <plx/data/Queue.hpp>
+#include <plx/lexer/Lexer.hpp>
+#include <plx/literal/InputStream.hpp>
 #include <plx/literal/String.hpp>
 #include <plx/literal/Symbol.hpp>
 #include <plx/object/Globals.hpp>
 #include <plx/object/HashCode.hpp>
+#include <plx/object/Object.hpp>
 
 PLX::HashTable* parseOptions(int argc, char** argv) {
     PLX::HashTable* argMap = new PLX::HashTable();
@@ -77,18 +80,16 @@ void shutdown() {
     delete PLX::GLOBALS;
 }
 
+void readEvalPrint() {
+    // TODO fill this in
+}
+
 int main(int argc, char** argv) {
     setup();
     PLX::HashTable* argMap = parseOptions(argc, argv);
     PLX::GLOBALS->SetArgMap(argMap);
-    if (!isatty(STDIN_FILENO)) {
-        // std::cin is redirected, data comes from a file
-        // TODO read/eval/print text from the file
-    }
-    else {
-        // std::cin is not redirected
-        // TODO instantiate and run a read/eval/print loop
-    }
+    // std::cout << "ArgMap = " << argMap << "\n";
+    readEvalPrint();
     shutdown();
     return 0;
 }

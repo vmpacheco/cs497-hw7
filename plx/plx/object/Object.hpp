@@ -36,6 +36,7 @@ namespace PLX {
         virtual bool hashCode(HashCode& hashCode);
         virtual bool index(Object* indexer, Object*& retrievedValue);
         virtual bool length(int& len);
+        virtual void markChildren();
         virtual bool match(Object* other, Triple*& bindings);
         virtual TypeId typeId() const;
 
@@ -53,24 +54,26 @@ namespace PLX {
         virtual bool percent(Object* other, Object*& value);
 
         bool isA(TypeId typeId) const;
+        bool isMarked() const;
+        void mark();
         std::string toString();
         std::string typeName() const;
         Symbol* typeSymbol() const;
+        void unmark();
 
         bool operator==(const Object& rhs) const;
         bool operator==(const Object* other) const;
         bool operator!=(const Object& rhs) const;
-        bool operator!=(const Object* rhs) const;
 
     private:
         static GC* _gc;
 
+        mutable bool _isMarked {false};
     };
 
     // This operator can't be a member function because the first
     // parameter is an ostream and not an Object.
     std::ostream& operator<<(std::ostream& ostream, const PLX::Object* object);
-    std::ostream& operator<<(std::ostream& ostream, const PLX::Object& object);
 
 }
 

@@ -1,26 +1,18 @@
-#include <cassert>
 #include <unordered_map>
 
 #include <plx/data/Array.hpp>
 #include <plx/data/HashTable.hpp>
-#include <plx/data/List.hpp>
-#include <plx/data/Triple.hpp>
 #include <plx/evaluator/Evaluator.hpp>
-#include <plx/object/Globals.hpp>
-#include <plx/object/HashCode.hpp>
-#include <plx/object/TypeIds.hpp>
 
 namespace PLX {
 
     HashTable::HashTable() {}
 
     bool HashTable::boolValue() const {
-        // return _nBindings != 0;
         return _map.size() != 0;
     }
 
     int HashTable::count() const {
-        // return _nBindings;
         return _map.size();
     }
 
@@ -87,6 +79,13 @@ namespace PLX {
     bool HashTable::length(int& len) {
         len = count();
         return true;
+    }
+
+    void HashTable::markChildren() {
+        for (auto iter = _map.begin(); iter != _map.end(); iter++) {
+            iter->first->mark();
+            iter->second->mark();
+        }
     }
 
     void HashTable::put(Object* key, Object* value) {

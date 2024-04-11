@@ -7,8 +7,10 @@ namespace PLX {
 
     class Object_Test : public ::testing::Test {
     public:
-        void SetUp() override {}
-        void TearDown() override {}
+        void SetUp() override {
+        }
+        void TearDown() override {
+        }
     private:
     };
 

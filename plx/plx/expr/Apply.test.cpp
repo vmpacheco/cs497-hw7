@@ -16,7 +16,6 @@ namespace PLX {
 
     class Apply_Test : public PlxTestFixture {};
 
-#if 0
     TEST_F(Apply_Test, CreateInstance) {
         Identifier* x = Identifier::create("x");
         Apply* apply = new Apply(x, GLOBALS->EmptyList());
@@ -41,6 +40,22 @@ namespace PLX {
         EXPECT_TRUE(value->equals(expectedArray));
     }
 
+    TEST_F(Apply_Test, MarkChildren) {
+        Identifier* x = Identifier::create("x");
+        Identifier* y = Identifier::create("y");
+        List* arguments = new List(y);
+        Apply* app1 = new Apply(x, arguments);
+        EXPECT_FALSE(app1->isMarked());
+        EXPECT_FALSE(arguments->isMarked());
+        EXPECT_FALSE(x->isMarked());
+        EXPECT_FALSE(y->isMarked());
+        app1->markChildren();
+        EXPECT_FALSE(app1->isMarked());
+        EXPECT_TRUE(arguments->isMarked());
+        EXPECT_TRUE(x->isMarked());
+        EXPECT_TRUE(y->isMarked());
+    }
+
     TEST_F(Apply_Test, ShowOn) {
         {
             Identifier* x = Identifier::create("x");
@@ -62,6 +77,5 @@ namespace PLX {
             EXPECT_EQ("(fun (x) = x)(y)", ss.str());
         }
     }
-#endif
 
 }

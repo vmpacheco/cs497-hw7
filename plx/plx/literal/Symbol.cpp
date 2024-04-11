@@ -2,8 +2,6 @@
 #include <plx/literal/String.hpp>
 #include <plx/literal/Symbol.hpp>
 #include <plx/object/Globals.hpp>
-#include <plx/object/Object.hpp>
-#include <plx/object/TypeIds.hpp>
 
 namespace PLX {
 

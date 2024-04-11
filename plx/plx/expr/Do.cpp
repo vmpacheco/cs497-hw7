@@ -1,12 +1,7 @@
-#include <cassert>
-
-#include <plx/data/Triple.hpp>
 #include <plx/data/List.hpp>
 #include <plx/evaluator/Evaluator.hpp>
 #include <plx/expr/Do.hpp>
 #include <plx/literal/Nil.hpp>
-#include <plx/object/Globals.hpp>
-#include <plx/object/TypeIds.hpp>
 
 namespace PLX {
 
@@ -26,6 +21,10 @@ namespace PLX {
         }
         etor->setEnvironment(savedEnv);
         return value;
+    }
+
+    void Do::markChildren() {
+        _exprs->mark();
     }
 
     void Do::showOn(std::ostream& ostream) const {

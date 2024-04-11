@@ -22,15 +22,23 @@ namespace PLX {
 
         Object* eval(Evaluator* etor, List* args) {
             const std::string PRIM_NAME = "eval";
-            (void)etor;
-            (void)args;
-            return GLOBALS->NilObject();
+            List* argVals = evalNArgs(PRIM_NAME, etor, args, {TypeId::Z_ANY});
+            Object* argVal = argVals->first();
+            return etor->evalExpr(argVal);
         }
 
         Object* notOperator(Evaluator* etor, List* args) {
             const std::string PRIM_NAME = "not";
+            List* argVals = evalNArgs(PRIM_NAME, etor, args, {TypeId::Z_ANY});
+            Object* arg = argVals->first();
+            return arg->boolValue() ? GLOBALS->False() : GLOBALS->True();
+        }
+
+        Object* repl(Evaluator* etor, List* args) {
+            const std::string PRIM_NAME = "repl";
+            std::clog << PRIM_NAME << " args = " << args << "\n";
+            std::clog << "primitive is not implemented fully\n";
             (void)etor;
-            (void)args;
             return GLOBALS->NilObject();
         }
 

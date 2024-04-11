@@ -79,7 +79,7 @@ namespace PLX {
         EXPECT_TRUE(hash2->equals(hash1));
     }
 
-    TEST_F(HashTable_Test, Eval) {
+    TEST_F(HashTable_Test, Eval_Evaluator) {
         // bind some names to values
         Identifier* x = Identifier::create("x");
         Identifier* y = Identifier::create("y");
@@ -205,6 +205,27 @@ namespace PLX {
         EXPECT_TRUE(keyArray->get(1, key2));
         EXPECT_TRUE(key1->equals(abc) || key1->equals(def));
         EXPECT_TRUE(key2->equals(abc) || key2->equals(def));
+    }
+
+    TEST_F(HashTable_Test, MarkChildren) {
+        HashTable* hash1 = new HashTable();
+        String* abc = new String("abc");
+        Integer* i100 = new Integer(100);
+        hash1->put(abc, i100);
+        String* def = new String("def");
+        Integer* i200 = new Integer(200);
+        hash1->put(def, i200);
+        EXPECT_FALSE(hash1->isMarked());
+        EXPECT_FALSE(abc->isMarked());
+        EXPECT_FALSE(i100->isMarked());
+        EXPECT_FALSE(def->isMarked());
+        EXPECT_FALSE(i200->isMarked());
+        hash1->markChildren();
+        EXPECT_FALSE(hash1->isMarked());
+        EXPECT_TRUE(abc->isMarked());
+        EXPECT_TRUE(i100->isMarked());
+        EXPECT_TRUE(def->isMarked());
+        EXPECT_TRUE(i200->isMarked());
     }
 
     TEST_F(HashTable_Test, ShowOn) {
