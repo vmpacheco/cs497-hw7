@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include <test/PlxTestFixture.hpp>
+#include <tests/PlxTestFixture.hpp>
 
 #include <plx/data/HashTable.hpp>
 #include <plx/literal/Symbol.hpp>
@@ -16,7 +16,7 @@ namespace PLX {
         EXPECT_EQ("Symbol", symbol1->typeName());
         Symbol* symbol2 = Symbol::create("Abc");
         // This asserts that both symbols are the same object
-        ASSERT_EQ(symbol1, symbol2);
+        ASSERT_EQ(static_cast<void*>(symbol1), static_cast<void*>(symbol2));
         HashCode hashCode1;
         EXPECT_TRUE(symbol1->hashCode(hashCode1));
         HashCode hashCode2;

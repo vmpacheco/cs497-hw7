@@ -1,12 +1,13 @@
 #include <gtest/gtest.h>
 
-#include <test/PlxTestFixture.hpp>
+#include <tests/PlxTestFixture.hpp>
 
-#include <plx/evaluator/Evaluator.hpp>
 #include <plx/expr/Identifier.hpp>
 #include <plx/expr/ParenExpr.hpp>
+#include <plx/gc/GC.hpp>
 #include <plx/literal/Integer.hpp>
 #include <plx/literal/Nil.hpp>
+#include <plx/vm/VM.hpp>
 
 namespace PLX {
 
@@ -18,11 +19,11 @@ namespace PLX {
         EXPECT_EQ("ParenExpr", parenExpr->typeName());
     }
 
-    TEST_F(ParenExpr_Test, Eval_Evaluator) {
-        Evaluator* etor = new Evaluator();
+    TEST_F(ParenExpr_Test, Eval) {
+        VM* vm = new VM();
         Integer* i123 = new Integer(123);
         ParenExpr* parenExpr = new ParenExpr(i123);
-        Object* value = etor->evalExpr(parenExpr);
+        Object* value = vm->evalExpr(parenExpr);
         EXPECT_EQ(*i123, *value);
     }
 
@@ -31,7 +32,8 @@ namespace PLX {
         ParenExpr* parenExpr = new ParenExpr(i123);
         EXPECT_FALSE(parenExpr->isMarked());
         EXPECT_FALSE(i123->isMarked());
-        parenExpr->markChildren();
+        std::vector<Object*> objs{parenExpr};
+        GC::mark(objs);
         EXPECT_FALSE(parenExpr->isMarked());
         EXPECT_TRUE(i123->isMarked());
     }

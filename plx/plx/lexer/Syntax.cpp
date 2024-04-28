@@ -15,10 +15,7 @@ namespace PLX {
     std::string QUOTE {"\""};
     std::string BACKSLASH {"\\"};
     std::string EOI {""};
-    std::string DEFAULT_RULE {"*DEFAULT*"};
-    // There's no need for the DEFAULT_RULE to be any particular string.
-    // The value of DEFAULT_RULE is never checked.
-    // The DEFAULT_RULE is the final rule in any lexer state.
+    std::string DEFAULT_RULE {"_DEFAULT_"};
 
     std::vector<std::string> reservedWords {
         "catch",

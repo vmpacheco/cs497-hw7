@@ -12,10 +12,24 @@
 namespace PLX {
 
     bool pIf(List*& tokens, Object*& value) {
-        // delete these three lines before fixing this function
-        (void)tokens;
-        (void)value;
-        return false;
+        static const std::initializer_list<Parser> parserList {
+            pRequireAny,
+            pReservedThen,
+            pRequireAny,
+            pReservedElse,
+            pRequireAny
+        };
+        if (!pReservedIf(tokens, value)) {
+            return false;
+        }
+        pSeq(parserList, tokens, value);
+        assert(value->isA(TypeId::D_QUEUE));
+        Queue* valueQueue = static_cast<Queue*>(value);
+        Object* condition = valueQueue->deq();
+        Object* consequent = valueQueue->deq();
+        Object* alternate = valueQueue->deq();
+        value = new If(condition, consequent, alternate);
+        return true;
     }
 
 }

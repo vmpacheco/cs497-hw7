@@ -1,17 +1,17 @@
 namespace PLX {
 
-    class Evaluator;
     class List;
     class Object;
+    class VM;
 
     namespace Prim_Global {
-
-        Object* argMap(Evaluator* etor, List* args);
-        Object* eval(Evaluator* etor, List* args);
-        Object* notOperator(Evaluator* etor, List* args);
-        Object* repl(Evaluator* etor, List* args);
-        Object* tokenize(Evaluator* etor, List* args);
-        Object* type(Evaluator* etor, List* args);
-
+        void argMap(VM* vm, List* args);
+        void close(VM* vm, List* args);
+        void eval(VM* vm, List* args);
+        void gc(VM* vm, List* args);
+        void notOperator(VM* vm, List* args);
+        void repl(VM* vm, List* args);
+        void type(VM* vm, List* args);
     }
+
 }

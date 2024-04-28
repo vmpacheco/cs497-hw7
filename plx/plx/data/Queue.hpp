@@ -1,6 +1,7 @@
 #pragma once
 
 #include <list>
+#include <vector>
 
 #include <plx/object/Globals.hpp>
 #include <plx/object/Object.hpp>
@@ -17,6 +18,7 @@ namespace PLX {
         // Unique functions ------------------------------------------------
 
         List* asList() const;
+        void clear();
         void enq(Object* elem);
         void enq(std::initializer_list<Object*> elems);
         Object* deq();
@@ -26,10 +28,11 @@ namespace PLX {
         // Overridden functions --------------------------------------------
 
         bool boolValue() const override;
+        Object* close(Triple* env) override;
         bool equals(const Object* other) const override;
-        Object* eval(Evaluator* etor) override;
+        void eval(VM* vm) override;
         bool length(int& len) override;
-        void markChildren() override;
+        void markChildren(std::vector<Object*>& objs) override;
         void showOn(std::ostream& ostream) const override;
         bool toArray(Array*& array) override;
         bool toList(List*& list) override;
@@ -37,9 +40,9 @@ namespace PLX {
         TypeId typeId() const override;
 
     private:
-        List* _head {GLOBALS->EmptyList()};
-        List* _tail {GLOBALS->EmptyList()};
-        int _nElems {0};
+        List* _head;
+        List* _tail;
+        int _nElems;
 
     };
 

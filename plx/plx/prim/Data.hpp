@@ -1,17 +1,17 @@
 
 namespace PLX {
 
-    class Evaluator;
     class List;
     class Object;
+    class VM;
 
     namespace Prim_Data {
 
-        Object* length(Evaluator* etor, List* args);
-        Object* toArray(Evaluator* etor, List* args);
-        Object* toList(Evaluator* etor, List* args);
-        Object* toQueue(Evaluator* etor, List* args);
-        Object* toString(Evaluator* etor, List* args);
+        void length(VM* vm, List* args);
+        void toArray(VM* vm, List* args);
+        void toList(VM* vm, List* args);
+        void toQueue(VM* vm, List* args);
+        void toString(VM* vm, List* args);
 
     }
 }

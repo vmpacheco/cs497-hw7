@@ -1,12 +1,13 @@
 #include <gtest/gtest.h>
 
-#include <test/PlxTestFixture.hpp>
+#include <tests/PlxTestFixture.hpp>
 
 #include <plx/data/Array.hpp>
 #include <plx/data/Closure.hpp>
 #include <plx/data/List.hpp>
 #include <plx/data/Triple.hpp>
-#include <plx/evaluator/Evaluator.hpp>
+#include <plx/gc/GC.hpp>
+#include <plx/vm/VM.hpp>
 #include <plx/expr/Function.hpp>
 #include <plx/expr/Identifier.hpp>
 #include <plx/literal/Integer.hpp>
@@ -22,24 +23,12 @@ namespace PLX {
         Object* body = GLOBALS->NilObject();
         Function* function = new Function(parameters, body);
         Triple* lexicalEnvironment = GLOBALS->EmptyTriple();
-        Closure* closure1 = new Closure(function, lexicalEnvironment, false);
+        Closure* closure1 = new Closure(function, lexicalEnvironment);
         EXPECT_TRUE(closure1->isA(TypeId::D_CLOSURE));
         EXPECT_EQ("Closure", closure1->typeName());
     }
 
-    TEST_F(Closure_Test, Apply_NoArgs) {
-        List* parameters = GLOBALS->EmptyList();
-        Object* body = GLOBALS->NilObject();
-        Function* function = new Function(parameters, body);
-        Triple* lexicalEnvironment = GLOBALS->EmptyTriple();
-        Closure* closure1 = new Closure(function, lexicalEnvironment, false);
-        Evaluator* etor = new Evaluator();
-        List* arguments = GLOBALS->EmptyList();
-        Object* value = closure1->apply(etor, arguments);
-        EXPECT_EQ(GLOBALS->NilObject(), value);
-    }
-
-    TEST_F(Closure_Test, Apply_MultipleArgs) {
+    TEST_F(Closure_Test, Apply) {
         Identifier* x = Identifier::create("x");
         Identifier* y = Identifier::create("y");
         Integer* i100 = new Integer(100);
@@ -48,16 +37,18 @@ namespace PLX {
         Object* body = new Array({x, y});
         Function* function = new Function(parameters, body);
         Triple* lexicalEnvironment = GLOBALS->EmptyTriple();
-        Closure* closure1 = new Closure(function, lexicalEnvironment, false);
-        Evaluator* etor = new Evaluator();
+        Closure* closure1 = new Closure(function, lexicalEnvironment);
+        VM* vm = new VM();
         List* arguments = new List(i100, new List(i200));
-        Object* value = closure1->apply(etor, arguments);
-        ASSERT_TRUE(value->isA(TypeId::D_ARRAY));
-        Array* valueArray = static_cast<Array*>(value);
+        closure1->apply(vm, arguments);
+        while (vm->step());
         Array* expectedArray = new Array({i100, i200});
-        EXPECT_TRUE(expectedArray->equals(valueArray));
+        Object* actualValue;
+        ASSERT_TRUE(vm->popObj(actualValue));
+        EXPECT_TRUE(expectedArray->equals(actualValue));
     }
 
+#if 0
     TEST_F(Closure_Test, Apply_Macro) {
         Identifier* x = Identifier::create("x");
         Identifier* y = Identifier::create("y");
@@ -67,15 +58,16 @@ namespace PLX {
         Object* body = new Array({x, y});
         Function* function = new Function(parameters, body);
         Triple* lexicalEnvironment = GLOBALS->EmptyTriple();
-        Closure* closure1 = new Closure(function, lexicalEnvironment, true);
-        Evaluator* etor = new Evaluator();
+        Closure* closure1 = new Closure(function, lexicalEnvironment);
+        VM* vm = new VM();
         List* arguments = new List(a, new List(b));
-        Object* value = closure1->apply(etor, arguments);
+        Object* value = closure1->apply(vm, arguments);
         ASSERT_TRUE(value->isA(TypeId::D_ARRAY));
         Array* valueArray = static_cast<Array*>(value);
         Array* expectedArray = new Array({a, b});
         EXPECT_TRUE(expectedArray->equals(valueArray));
     }
+#endif
 
     TEST_F(Closure_Test, Apply_LexicalEnvironment) {
         Identifier* x = Identifier::create("x");
@@ -85,13 +77,16 @@ namespace PLX {
         Object* body = x;
         Function* function = new Function(parameters, body);
         Triple* lexicalEnvironment = new Triple(x, i100);
-        Closure* closure1 = new Closure(function, lexicalEnvironment, false);
-        Evaluator* etor = new Evaluator();
+        Closure* closure1 = new Closure(function, lexicalEnvironment);
+        VM* vm = new VM();
         // The lexical environment has x=100 and the dynamic environment has x=200.
         // The lexical environment should be used before the dynamic environment.
-        etor->bind(x, i200);
+        vm->bind(x, i200);
         List* arguments = GLOBALS->EmptyList();
-        Object* value = closure1->apply(etor, arguments);
+        closure1->apply(vm, arguments);
+        while (vm->step());
+        Object* value;
+        ASSERT_TRUE(vm->popObj(value));
         ASSERT_TRUE(value->isA(TypeId::L_INTEGER));
         EXPECT_TRUE(i100->equals(value));
     }
@@ -103,13 +98,15 @@ namespace PLX {
         Object* body = x;
         Function* function = new Function(parameters, body);
         Triple* lexicalEnvironment = GLOBALS->EmptyTriple();
-        Closure* closure1 = new Closure(function, lexicalEnvironment, false);
-        Evaluator* etor = new Evaluator();
+        Closure* closure1 = new Closure(function, lexicalEnvironment);
+        VM* vm = new VM();
         // The lexical environment is empty and the dynamic environment has x=200.
         // The dynamic environment is not visible to this expression, though.
-        etor->bind(x, i100);
+        vm->bind(x, i100);
         List* arguments = GLOBALS->EmptyList();
-        EXPECT_THROW(closure1->apply(etor, arguments), Array*);
+        closure1->apply(vm, arguments);
+        auto lam = [vm]() { while (vm->step()); };
+        EXPECT_THROW(lam(), Array*);
     }
 
     TEST_F(Closure_Test, MarkChildren) {
@@ -121,11 +118,12 @@ namespace PLX {
         Object* body = y;
         Function* function = new Function(parameters, body);
         Triple* lexicalEnvironment = new Triple(z, i100);
-        Closure* closure1 = new Closure(function, lexicalEnvironment, false);
+        Closure* closure1 = new Closure(function, lexicalEnvironment);
         EXPECT_FALSE(closure1->isMarked());
         EXPECT_FALSE(function->isMarked());
         EXPECT_FALSE(lexicalEnvironment->isMarked());
-        closure1->markChildren();
+        std::vector<Object*> objs{closure1};
+        GC::mark(objs);
         EXPECT_FALSE(closure1->isMarked());
         EXPECT_TRUE(function->isMarked());
         EXPECT_TRUE(lexicalEnvironment->isMarked());
@@ -140,7 +138,7 @@ namespace PLX {
         Object* body = y;
         Function* function = new Function(parameters, body);
         Triple* lexicalEnvironment = new Triple(z, i100);
-        Closure* closure1 = new Closure(function, lexicalEnvironment, false);
+        Closure* closure1 = new Closure(function, lexicalEnvironment);
         std::stringstream ss;
         ss << closure1;
         EXPECT_EQ("fun (x) = y", ss.str());

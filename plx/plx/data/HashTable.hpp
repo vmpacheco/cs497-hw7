@@ -1,6 +1,7 @@
 #pragma once
 
 #include <unordered_map>
+#include <vector>
 
 #include <plx/object/Object.hpp>
 
@@ -25,11 +26,12 @@ namespace PLX {
         // Overridden functions --------------------------------------------
 
         bool boolValue() const override;
+        Object* close(Triple* env) override;
         bool equals(const Object* other) const override;
-        Object* eval(Evaluator* etor) override;
+        void eval(VM* vm) override;
         bool index(Object* indexer, Object*& retrievedValue) override;
         bool length(int& len) override;
-        void markChildren() override;
+        void markChildren(std::vector<Object*>& objs) override;
         void showOn(std::ostream& ostream) const override;
         TypeId typeId() const override;
 

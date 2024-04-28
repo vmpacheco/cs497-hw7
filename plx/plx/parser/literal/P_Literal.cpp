@@ -1,9 +1,8 @@
+#include <plx/data/List.hpp>
 #include <plx/object/Globals.hpp>
 #include <plx/parser/P_Primitive.hpp>
 
 namespace PLX {
-
-    bool pQuote(List*& tokens, Object*& value);
 
     bool pBoolean(List*& tokens, Object*& value) {
         return pSpotAndStrip(GLOBALS->BooleanSymbol(), tokens, value);
@@ -27,7 +26,7 @@ namespace PLX {
 
     bool pLiteral(List*& tokens, Object*& value) {
         static const std::initializer_list<Parser> parserList {
-            pBoolean, pInteger, pNil, pString, pSymbol, pQuote
+            pBoolean, pInteger, pNil, pString, pSymbol
         };
         return pOneOf(parserList, tokens, value);
     }

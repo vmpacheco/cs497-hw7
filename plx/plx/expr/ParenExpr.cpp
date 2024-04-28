@@ -1,5 +1,8 @@
-#include <plx/evaluator/Evaluator.hpp>
+#include <cassert>
+
+#include <plx/vm/VM.hpp>
 #include <plx/expr/ParenExpr.hpp>
+#include <plx/object/TypeIds.hpp>
 
 namespace PLX {
 
@@ -7,12 +10,16 @@ namespace PLX {
         : _expr {expr}
     {}
 
-    Object* ParenExpr::eval(Evaluator* etor) {
-        return etor->evalExpr(_expr);
+    Object* ParenExpr::close(Triple* env) {
+        return _expr->close(env);
     }
 
-    void ParenExpr::markChildren() {
-        _expr->mark();
+    void ParenExpr::eval(VM* vm) {
+        vm->pushExpr(_expr);
+    }
+
+    void ParenExpr::markChildren(std::vector<Object*>& objs) {
+        objs.push_back(_expr);
     }
 
     void ParenExpr::showOn(std::ostream& ostream) const {

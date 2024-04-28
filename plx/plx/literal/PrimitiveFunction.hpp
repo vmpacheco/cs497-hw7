@@ -1,10 +1,12 @@
 #pragma once
 
+#include <vector>
+
 #include <plx/object/Object.hpp>
 
 namespace PLX {
 
-    typedef Object* (*Primitive)(Evaluator* etor, List* arguments);
+    typedef void (*Primitive)(VM* vm, List* arguments);
 
     class PrimitiveFunction : public Object {
     public:
@@ -16,7 +18,7 @@ namespace PLX {
     
         // Overridden functions --------------------------------------------
 
-        Object* apply(Evaluator* etor, List* arguments) override;
+        void apply(VM* vm, List* arguments) override final;
         bool hashCode(HashCode& hashCode) override;
         void showOn(std::ostream& ostream) const override;
         TypeId typeId() const override;
@@ -24,7 +26,6 @@ namespace PLX {
     private:
         std::string _name;
         Primitive _primitive;
-
     };
 
 }

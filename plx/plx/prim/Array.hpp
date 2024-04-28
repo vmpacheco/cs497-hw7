@@ -1,14 +1,14 @@
 
 namespace PLX {
 
-    class Evaluator;
     class List;
     class Object;
+    class VM;
 
     namespace Prim_Array {
 
-        Object* get(Evaluator* etor, List* args);
-        Object* set(Evaluator* etor, List* args);
+        void get(VM* vm, List* args);
+        void set(VM* vm, List* args);
 
     }
 }

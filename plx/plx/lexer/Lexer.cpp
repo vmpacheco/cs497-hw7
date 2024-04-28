@@ -3,7 +3,9 @@
 #include <map>
 
 #include <plx/data/Array.hpp>
+#include <plx/data/HashTable.hpp>
 #include <plx/data/Queue.hpp>
+#include <plx/data/Triple.hpp>
 #include <plx/expr/Identifier.hpp>
 #include <plx/lexer/Lexer.hpp>
 #include <plx/lexer/Syntax.hpp>
@@ -13,6 +15,8 @@
 #include <plx/literal/Nil.hpp>
 #include <plx/literal/String.hpp>
 #include <plx/literal/Symbol.hpp>
+#include <plx/object/Globals.hpp>
+#include <plx/object/Object.hpp>
 
 namespace PLX {
 
@@ -28,11 +32,11 @@ namespace PLX {
 
     bool Lexer::tokenize(const std::string& string, List*& tokens, Object*& errorValue) {
         InputStream* inputStream = new InputStream(string);
+        this->_state = StateName::INIT;
         return tokenize(inputStream, tokens, errorValue);
     }
 
     bool Lexer::tokenize(InputStream* inputStream, List*& tokens, Object*& errorValue) {
-        this->_state = StateName::INIT;
         Queue* tokenQueue = new Queue();
         std::string lexeme = "";
         char c = 0;
@@ -114,8 +118,8 @@ namespace PLX {
 
     Rule Lexer::_locateRule(char c) const {
         std::vector<Rule>& rules = syntax[_state];
-        int n;
-        for (n=0; n<static_cast<int>(rules.size()); n++) {
+        int n=0;
+        while (true) {
             Rule& rule = rules[n];
             if (c == 0 && rule.charSet == "") {
                 return rule;
@@ -123,8 +127,13 @@ namespace PLX {
             if (rule.charSet.find(c) < rule.charSet.length()) {
                 return rule;
             }
+            n++;
+            if (n == static_cast<int>(rules.size())) {
+                // we've reached the end of the rules
+                // return the final rule as the default rule
+                return rule;
+            }
         }
-        return rules[n-1];
     }
 
     Array* Lexer::_error(char c, Array* position) const {

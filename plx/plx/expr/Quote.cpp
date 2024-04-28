@@ -1,5 +1,8 @@
+#include <cassert>
+
 #include <plx/expr/Quote.hpp>
-#include <plx/evaluator/Evaluator.hpp>
+#include <plx/vm/VM.hpp>
+#include <plx/object/TypeIds.hpp>
 
 namespace PLX {
 
@@ -7,23 +10,12 @@ namespace PLX {
         : _expr {expr}
     {}
 
-    Object* Quote::eval(Evaluator* etor) {
-        (void)etor;
-        return _expr;
+    void Quote::eval(VM* vm) {
+        vm->pushObj(_expr);
     }
 
-    bool Quote::hashCode(HashCode& hashCode) {
-        static const int typeHashCode = std::hash<int>{}(static_cast<int>(typeId()));
-        HashCode exprHashCode;
-        if (_expr->hashCode(exprHashCode)) {
-            hashCode = typeHashCode ^ exprHashCode;
-            return true;
-        }
-        return false;
-    }
-
-    void Quote::markChildren() {
-        _expr->mark();
+    void Quote::markChildren(std::vector<Object*>& objs) {
+        objs.push_back(_expr);
     }
 
     void Quote::showOn(std::ostream& ostream) const {

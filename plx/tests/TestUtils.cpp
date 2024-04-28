@@ -1,6 +1,6 @@
 #include <cassert>
 
-#include <test/TestUtils.hpp>
+#include <tests/TestUtils.hpp>
 
 #include <plx/data/Array.hpp>
 #include <plx/data/Triple.hpp>

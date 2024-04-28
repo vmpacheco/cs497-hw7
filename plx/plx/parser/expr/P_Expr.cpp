@@ -1,7 +1,10 @@
 #include <cassert>
 
+#include <plx/data/List.hpp>
+#include <plx/object/Object.hpp>
 #include <plx/parser/expr/P_Expr.hpp>
 #include <plx/parser/P_Primitive.hpp>
+#include <plx/parser/Parser.hpp>
 
 namespace PLX {
 

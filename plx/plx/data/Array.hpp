@@ -25,13 +25,14 @@ namespace PLX {
         // Overridden functions --------------------------------------------
 
         bool boolValue() const override;
+        Object* close(Triple* env) override;
         bool equals(const Object* other) const override;
-        Object* eval(Evaluator* etor) override;
+        void eval(VM* vm) override;
         List* freeVars(List* freeVars) override;
         bool hashCode(HashCode& hashCode) override;
         bool index(Object* indexer, Object*& retrievedValue) override;
         bool length(int& len) override;
-        void markChildren() override;
+        void markChildren(std::vector<Object*>& objs) override;
         bool match(Object* other, Triple*& bindings) override;
         void showOn(std::ostream& ostream) const override;
         bool toArray(Array*& array) override;

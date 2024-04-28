@@ -1,16 +1,17 @@
 #include <gtest/gtest.h>
 
-#include <test/PlxTestFixture.hpp>
+#include <tests/PlxTestFixture.hpp>
 
 #include <plx/data/Array.hpp>
 #include <plx/data/Triple.hpp>
-#include <plx/evaluator/Evaluator.hpp>
 #include <plx/expr/Identifier.hpp>
+#include <plx/gc/GC.hpp>
 #include <plx/literal/Integer.hpp>
 #include <plx/literal/Nil.hpp>
 #include <plx/literal/String.hpp>
 #include <plx/object/Globals.hpp>
 #include <plx/object/TypeIds.hpp>
+#include <plx/vm/VM.hpp>
 
 namespace PLX {
 
@@ -48,7 +49,10 @@ namespace PLX {
         EXPECT_TRUE(triple3->equals(triple2));
     }
 
-    TEST_F(Triple_Test, Eval_Evaluator) {
+    TEST_F(Triple_Test, Eval) {
+        GC* savedGc = GLOBALS->Gc();
+        GC gc;
+        Object::setGC(&gc);
         Identifier* a = Identifier::create("a");
         Identifier* b = Identifier::create("b");
         Identifier* c = Identifier::create("c");
@@ -57,17 +61,18 @@ namespace PLX {
         Integer* i200 = new Integer(200);
         Integer* i300 = new Integer(300);
         Integer* i400 = new Integer(400);
-        Evaluator* etor = new Evaluator();
-        etor->bind(a, i100);
-        etor->bind(b, i200);
-        etor->bind(c, i300);
-        etor->bind(d, i400);
+        VM* vm = new VM();
+        vm->bind(a, i100);
+        vm->bind(b, i200);
+        vm->bind(c, i300);
+        vm->bind(d, i400);
         Triple* triple1 = new Triple(a, b, new Triple(c, d));
-        Object* value = etor->evalExpr(triple1);
+        Object* value = vm->evalExpr(triple1);
         EXPECT_TRUE(value->isA(TypeId::D_TRIPLE));
         Triple* tripleValue = static_cast<Triple*>(value);
         Triple* expectedTriple = new Triple(i100, i200, new Triple(i300, i400));
         EXPECT_TRUE(expectedTriple->equals(tripleValue));
+        Object::setGC(savedGc);
     }
 
     TEST_F(Triple_Test, IsEmpty) {
@@ -104,7 +109,8 @@ namespace PLX {
         EXPECT_FALSE(abc->isMarked());
         EXPECT_FALSE(i100->isMarked());
         EXPECT_FALSE(triple1->isMarked());
-        triple2->markChildren();
+        std::vector<Object*> objs{triple2};
+        GC::mark(objs);
         EXPECT_FALSE(triple2->isMarked());
         EXPECT_TRUE(abc->isMarked());
         EXPECT_TRUE(i100->isMarked());

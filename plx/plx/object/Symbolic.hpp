@@ -8,7 +8,7 @@ namespace PLX {
 
     class Symbolic : public Object {
     public:
-        Symbolic(const std::string& name, TypeId typeId);
+        Symbolic(const std::string& name);
 
         // Unique functions ------------------------------------------------
 

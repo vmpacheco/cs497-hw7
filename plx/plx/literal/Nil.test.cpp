@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include <test/PlxTestFixture.hpp>
+#include <tests/PlxTestFixture.hpp>
 
 #include <plx/literal/Nil.hpp>
 #include <plx/object/TypeIds.hpp>

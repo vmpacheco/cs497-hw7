@@ -1,13 +1,17 @@
+#include <cassert>
 #include <vector>
 
 #include <plx/data/Array.hpp>
 #include <plx/data/Queue.hpp>
-#include <plx/evaluator/Evaluator.hpp>
+#include <plx/vm/VM.hpp>
 #include <plx/literal/Integer.hpp>
 #include <plx/literal/Nil.hpp>
 #include <plx/literal/String.hpp>
 #include <plx/literal/Symbol.hpp>
+#include <plx/object/Globals.hpp>
+#include <plx/object/Object.hpp>
 #include <plx/object/ThrowException.hpp>
+#include <plx/object/TypeIds.hpp>
 
 namespace PLX {
 
@@ -32,6 +36,15 @@ namespace PLX {
         return _elems.size() > 0;
     }
 
+    Object* Array::close(Triple* env) {
+        int len = length();
+        Array* closedArray = new Array(len);
+        for (int n=0; n<len; n++) {
+            closedArray->_elems[n] = _elems[n]->close(env);
+        }
+        return closedArray;
+    }
+
     bool Array::equals(const Object* other) const {
         if (this == other) {
             return true;
@@ -54,15 +67,35 @@ namespace PLX {
         return true;
     }
 
-    Object* Array::eval(Evaluator* etor) {
-        int nElems = _elems.size();
-        Array* newArray = new Array(nElems);
-        for (int n=0; n<nElems; n++) {
-            Object* elem = _elems[n];
-            Object* value = etor->evalExpr(elem);
-            newArray->set(n, value);
+    class ArrayContin : public Object {
+    public:
+        ArrayContin(int nElems)
+            : _nElems {nElems}
+        {}
+        void eval(VM* vm) override {
+            Array* array = new Array(_nElems);
+            for (int n=0; n<_nElems; n++) {
+                Object* elem;
+                assert(vm->popObj(elem));
+                array->set(n, elem);
+            }
+            vm->pushObj(array);
         }
-        return newArray;
+        void showOn(std::ostream& ostream) const override {
+            ostream << "ArrayContin{" << _nElems << "}";
+        }
+        TypeId typeId() const override {
+            return TypeId::C_CONTINUATION;
+        }
+    private:
+        int _nElems;
+    };
+
+    void Array::eval(VM* vm) {
+        vm->pushExpr(new ArrayContin(_elems.size()));
+        for (Object* elem : _elems) {
+            vm->pushExpr(elem);
+        }
     }
 
     List* Array::freeVars(List* freeVars) {
@@ -125,9 +158,9 @@ namespace PLX {
         return true;
     }
 
-    void Array::markChildren() {
+    void Array::markChildren(std::vector<Object*>& objs) {
         for (Object* elem : _elems) {
-            elem->mark();
+            objs.push_back(elem);
         }
     }
 

@@ -1,6 +1,9 @@
+#include <cassert>
+
 #include <plx/expr/Throw.hpp>
 #include <plx/object/Globals.hpp>
 #include <plx/parser/P_Primitive.hpp>
+#include <plx/parser/Parser.hpp>
 
 namespace PLX {
 

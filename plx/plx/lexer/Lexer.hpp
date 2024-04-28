@@ -28,9 +28,6 @@ namespace PLX {
         TypeId typeId() const override;
 
     private:
-        static Symbol* tokenTypeSymbols(TokenType tokenType);
-
-        Triple* _currentPos() const;
         Array* _error(char c, Array* position) const;
         Rule _locateRule(char c) const;
         Array* _createToken(TokenType tokenType, std::string& lexeme, Array* pos) const;

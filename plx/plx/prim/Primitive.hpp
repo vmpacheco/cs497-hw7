@@ -5,12 +5,10 @@
 
 namespace PLX {
 
-    class Evaluator;
     class List;
+    class VM;
 
     void argumentCountMismatch(const std::string& name, int nExpectedArgs, int nActualArgs);
-
-    List* evalArgs(Evaluator* etor, List* args);
-    List* evalNArgs(const std::string& name, Evaluator* etor, List* args, std::initializer_list<TypeId> types);
+    void checkArgTypes(const std::string& name, List* args, std::initializer_list<TypeId> types);
 
 }

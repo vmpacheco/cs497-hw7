@@ -1,13 +1,24 @@
+#include <cassert>
 #include <list>
+#include <vector>
 
+#include <plx/data/Array.hpp>
 #include <plx/data/List.hpp>
 #include <plx/data/Queue.hpp>
-#include <plx/evaluator/Evaluator.hpp>
+#include <plx/vm/VM.hpp>
+#include <plx/literal/String.hpp>
+#include <plx/object/Globals.hpp>
+#include <plx/object/Object.hpp>
 #include <plx/object/ThrowException.hpp>
+#include <plx/object/TypeIds.hpp>
 
 namespace PLX {
 
-    Queue::Queue() {}
+    Queue::Queue()
+        : _head {GLOBALS->EmptyList()}
+        , _tail {GLOBALS->EmptyList()}
+        , _nElems {0}
+    {}
 
     Queue::Queue(std::initializer_list<Object*> elems)
         : Queue()
@@ -23,6 +34,24 @@ namespace PLX {
         return _nElems != 0;
     }
 
+    void Queue::clear() {
+        while (!isEmpty()) {
+            deq();
+        }
+    }
+
+    Object* Queue::close(Triple* env) {
+        Queue* closedQueue = new Queue();
+        List* elems = _head;
+        while (!elems->isEmpty()) {
+            Object* elem = elems->first();
+            Object* closedElem = elem->close(env);
+            closedQueue->enq(closedElem);
+            elems = elems->restAsList();
+        }
+        return closedQueue;
+    }
+
     Object* Queue::deq() {
         if (_nElems == 0) {
             throwException("Queue", "Queue empty", this);
@@ -35,7 +64,7 @@ namespace PLX {
 
     void Queue::enq(Object* elem) {
         List* link = new List(elem, GLOBALS->EmptyList());
-        if (_tail->isEmpty()) {
+        if (_nElems == 0) {
             _head = _tail = link;
         }
         else {
@@ -65,16 +94,40 @@ namespace PLX {
         return false;
     }
 
-    Object* Queue::eval(Evaluator* etor) {
-        Queue* newQueue = new Queue();
-        List* elems = _head;
-        while (!elems->isEmpty()) {
-            Object* elem = elems->first();
-            Object* value = etor->evalExpr(elem);
-            newQueue->enq(value);
-            elems = elems->restAsList();
+    class QueueContin : public Object {
+    public:
+        QueueContin(int nElems)
+            : _nElems {nElems}
+        {}
+        void eval(VM* vm) override {
+            Queue* queue = new Queue();
+            for (int n=0; n<_nElems; n++) {
+                Object* elem;
+                assert(vm->popObj(elem));
+                queue->enq(elem);
+            }
+            vm->pushObj(queue);
         }
-        return newQueue;
+        void showOn(std::ostream& ostream) const override {
+            ostream << "QueueContin{" << _nElems << "}";
+        }
+        TypeId typeId() const override {
+            return TypeId::C_CONTINUATION;
+        }
+    private:
+        int _nElems;
+    };
+
+    void Queue::eval(VM* vm) {
+        vm->pushExpr(new QueueContin(_nElems));
+        List* head = _head;
+        int n = 0;
+        while (!head->isEmpty()) {
+            vm->pushExpr(head->first());
+            head = head->restAsList();
+            n++;
+        }
+        assert(_nElems == n);
     }
 
     bool Queue::isEmpty() const {
@@ -90,8 +143,8 @@ namespace PLX {
         return true;
     }
 
-    void Queue::markChildren() {
-        _head->mark();
+    void Queue::markChildren(std::vector<Object*>& objs) {
+        objs.push_back(_head);
     }
 
     void Queue::showOn(std::ostream& ostream) const {

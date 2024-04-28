@@ -1,11 +1,12 @@
 #include <gtest/gtest.h>
 
-#include <test/PlxTestFixture.hpp>
+#include <tests/PlxTestFixture.hpp>
 
-#include <plx/evaluator/Evaluator.hpp>
 #include <plx/expr/Identifier.hpp>
 #include <plx/expr/Quote.hpp>
+#include <plx/gc/GC.hpp>
 #include <plx/literal/Nil.hpp>
+#include <plx/vm/VM.hpp>
 
 namespace PLX {
 
@@ -17,11 +18,11 @@ namespace PLX {
         EXPECT_EQ("Quote", quote1->typeName());
     }
 
-    TEST_F(Quote_Test, Eval_Evaluator) {
-        Evaluator* etor = new Evaluator();
+    TEST_F(Quote_Test, Eval) {
+        VM* vm = new VM();
         Identifier* x = Identifier::create("x");
         Quote* quote = new Quote(x);
-        Object* resObj = etor->evalExpr(quote);
+        Object* resObj = vm->evalExpr(quote);
         EXPECT_EQ(x, resObj);
     }
 
@@ -30,7 +31,8 @@ namespace PLX {
         Quote* quote = new Quote(x);
         EXPECT_FALSE(quote->isMarked());
         EXPECT_FALSE(x->isMarked());
-        quote->markChildren();
+        std::vector<Object*> objs{quote};
+        GC::mark(objs);
         EXPECT_FALSE(quote->isMarked());
         EXPECT_TRUE(x->isMarked());
     }

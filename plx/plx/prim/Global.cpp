@@ -2,10 +2,9 @@
 
 #include <plx/data/HashTable.hpp>
 #include <plx/data/List.hpp>
-#include <plx/evaluator/Evaluator.hpp>
+#include <plx/vm/VM.hpp>
 #include <plx/literal/Boolean.hpp>
 #include <plx/literal/Nil.hpp>
-#include <plx/literal/String.hpp>
 #include <plx/literal/Symbol.hpp>
 #include <plx/object/Globals.hpp>
 #include <plx/object/Object.hpp>
@@ -14,39 +13,73 @@
 namespace PLX {
     namespace Prim_Global {
 
-        Object* argMap(Evaluator* etor, List* args) {
+        void argMap(VM* vm, List* args) {
             const std::string PRIM_NAME = "argMap";
-            evalNArgs(PRIM_NAME, etor, args, {});
-            return GLOBALS->ArgMap();
+            checkArgTypes(PRIM_NAME, args, {});
+            vm->pushObj(GLOBALS->ArgMap());
         }
 
-        Object* eval(Evaluator* etor, List* args) {
+        void close(VM* vm, List* args) {
+            const std::string PRIM_NAME = "close";
+            checkArgTypes(PRIM_NAME, args, {TypeId::Z_ANY});
+            Object* arg = args->first();
+            std::cerr << "prim close called on " << arg << " :: " << arg->typeName() << "\n";
+            Triple* env = vm->environment();
+            Object* closedArg = arg->close(env);
+            vm->pushObj(closedArg);
+        }
+
+        void eval(VM* vm, List* args) {
             const std::string PRIM_NAME = "eval";
-            List* argVals = evalNArgs(PRIM_NAME, etor, args, {TypeId::Z_ANY});
-            Object* argVal = argVals->first();
-            return etor->evalExpr(argVal);
+            checkArgTypes(PRIM_NAME, args, {TypeId::Z_ANY});
+            Object* arg = args->first();
+            vm->pushObj(vm->evalExpr(arg));
         }
 
-        Object* notOperator(Evaluator* etor, List* args) {
+        void gc(VM* vm, List* args) {
+            const std::string PRIM_NAME = "gc";
+            checkArgTypes(PRIM_NAME, args, {});
+            vm->setGcNeeded();
+            vm->pushObj(GLOBALS->NilObject());
+        }
+
+        void notOperator(VM* vm, List* args) {
             const std::string PRIM_NAME = "not";
-            List* argVals = evalNArgs(PRIM_NAME, etor, args, {TypeId::Z_ANY});
-            Object* arg = argVals->first();
-            return arg->boolValue() ? GLOBALS->False() : GLOBALS->True();
+            checkArgTypes(PRIM_NAME, args, {TypeId::Z_ANY});
+            Object* arg = args->first();
+            vm->pushObj(arg->boolValue() ? GLOBALS->False() : GLOBALS->True());
         }
 
-        Object* repl(Evaluator* etor, List* args) {
+        void repl(VM* vm, List* args) {
             const std::string PRIM_NAME = "repl";
+            checkArgTypes(PRIM_NAME, args, {});
             std::clog << PRIM_NAME << " args = " << args << "\n";
             std::clog << "primitive is not implemented fully\n";
-            (void)etor;
-            return GLOBALS->NilObject();
+            (void)vm;
+            vm->pushObj(GLOBALS->NilObject());
         }
 
-        Object* type(Evaluator* etor, List* args) {
+#if 0
+        Object* tokenize(Evaluator* etor, List* args) {
+            const std::string PRIM_NAME = "tokenize";
+            List* argVals = evalNArgs(PRIM_NAME, etor, args, {TypeId::L_STRING});
+            String* string = static_cast<String*>(argVals->first());
+            ReadEvalPrint* rep = etor->getRep();
+            List* tokenList;
+            Object* error;
+            if (!rep->tokenizeString(string->value(), tokenList, error)) {
+                // TODO What's supposed to happen here?
+                assert(false);
+            }
+            return tokenList;
+        }
+#endif
+
+        void type(VM* vm, List* args) {
             const std::string PRIM_NAME = "type";
-            List* argVals = evalNArgs(PRIM_NAME, etor, args, {TypeId::Z_ANY});
-            Object* arg = argVals->first();
-            return Symbol::create(arg->typeName());
+            checkArgTypes(PRIM_NAME, args, {TypeId::Z_ANY});
+            Object* arg = args->first();
+            vm->pushObj(Symbol::create(arg->typeName()));
         }
 
     }

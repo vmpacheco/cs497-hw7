@@ -1,5 +1,9 @@
-#include <plx/evaluator/Evaluator.hpp>
+#include <cassert>
+
+#include <plx/literal/Boolean.hpp>
+#include <plx/vm/VM.hpp>
 #include <plx/expr/If.hpp>
+#include <plx/object/TypeIds.hpp>
 
 namespace PLX {
 
@@ -9,17 +13,51 @@ namespace PLX {
         , _alt {alt}
     {}
 
-    Object* If::eval(Evaluator* etor) {
-        Object* condRes = etor->evalExpr(_cond);
-        return condRes->boolValue()
-             ? etor->evalExpr(_conseq)
-             : etor->evalExpr(_alt);
+    Object* If::close(Triple* env) {
+        Object* cond = _cond->close(env);
+        if (cond->isA(TypeId::L_BOOLEAN)) {
+            Boolean* b = static_cast<Boolean*>(cond);
+            return b->boolValue() ? _conseq->close(env) : _alt->close(env);
+        }
+        Object* conseq = _conseq->close(env);
+        Object* alt = _alt->close(env);
+        return new If(cond, conseq, alt);
     }
 
-    void If::markChildren() {
-        _cond->mark();
-        _conseq->mark();
-        _alt->mark();
+    class IfContin : public Object {
+    public:
+        IfContin(Object* conseq, Object* alt)
+            : _conseq {conseq}
+            , _alt {alt}
+        {}
+        void eval(VM* vm) override {
+            Object* condVal;
+            assert(vm->popObj(condVal));
+            vm->pushExpr(condVal->boolValue() ? _conseq : _alt);
+        }
+        void markChildren(std::vector<Object*>& objs) override {
+            objs.push_back(_conseq);
+            objs.push_back(_alt);
+        }
+        void showOn(std::ostream& ostream) const override {
+            ostream << "IfContin{}";
+        }
+        TypeId typeId() const override {
+            return TypeId::C_CONTINUATION;
+        }
+    private:
+        Object* _conseq;
+        Object* _alt;
+    };
+
+    void If::eval(VM* vm) {
+        vm->pushExpr(new IfContin(_conseq, _alt));
+        vm->pushExpr(_cond);
+    }
+
+    void If::markChildren(std::vector<Object*>& objs) {
+        (void)objs;
+        // TODO
     }
 
     void If::showOn(std::ostream& ostream) const {

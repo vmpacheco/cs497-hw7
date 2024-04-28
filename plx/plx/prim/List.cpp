@@ -2,39 +2,39 @@
 
 #include <plx/data/Array.hpp>
 #include <plx/data/List.hpp>
-#include <plx/evaluator/Evaluator.hpp>
+#include <plx/vm/VM.hpp>
 #include <plx/object/TypeIds.hpp>
 #include <plx/prim/Primitive.hpp>
 
 namespace PLX {
     namespace Prim_List {
 
-        Object* first(Evaluator* etor, List* args) {
-            List* argVals = evalNArgs("first", etor, args, {TypeId::D_LIST});
-            List* list = static_cast<List*>(argVals->first());
-            return list->first();
+        void first(VM* vm, List* args) {
+            checkArgTypes("first", args, {TypeId::D_LIST});
+            List* list = static_cast<List*>(args->first());
+            vm->pushObj(list->first());
         }
 
-        Object* rest(Evaluator* etor, List* args) {
-            List* argVals = evalNArgs("rest", etor, args, {TypeId::D_LIST});
-            List* list = static_cast<List*>(argVals->first());
-            return list->rest();
+        void rest(VM* vm, List* args) {
+            checkArgTypes("rest", args, {TypeId::D_LIST});
+            List* list = static_cast<List*>(args->first());
+            vm->pushObj(list->rest());
         }
 
-        Object* setFirst(Evaluator* etor, List* args) {
-            List* argVals = evalNArgs("setFirst", etor, args, {TypeId::D_LIST, TypeId::Z_ANY});
-            List* list = static_cast<List*>(argVals->first());
-            Object* elem = argVals->second();
+        void setFirst(VM* vm, List* args) {
+            checkArgTypes("setFirst", args, {TypeId::D_LIST, TypeId::Z_ANY});
+            List* list = static_cast<List*>(args->first());
+            Object* elem = args->second();
             list->setFirst(elem);
-            return list;
+            vm->pushObj(list);
         }
 
-        Object* setRest(Evaluator* etor, List* args) {
-            List* argVals = evalNArgs("setRest", etor, args, {TypeId::D_LIST, TypeId::Z_ANY});
-            List* list = static_cast<List*>(argVals->first());
-            Object* elem = argVals->second();
+        void setRest(VM* vm, List* args) {
+            checkArgTypes("setRest", args, {TypeId::D_LIST, TypeId::Z_ANY});
+            List* list = static_cast<List*>(args->first());
+            Object* elem = args->second();
             list->setRest(elem);
-            return list;
+            vm->pushObj(list);
         }
 
     }

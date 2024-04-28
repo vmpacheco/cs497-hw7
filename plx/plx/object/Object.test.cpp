@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include <plx/object/Object.hpp>
+#include <plx/gc/GC.hpp>
 #include <plx/object/TypeIds.hpp>
 
 namespace PLX {
@@ -8,10 +8,14 @@ namespace PLX {
     class Object_Test : public ::testing::Test {
     public:
         void SetUp() override {
+            _gc = new GC();
+            Object::setGC(_gc);
         }
         void TearDown() override {
+            delete _gc;
         }
     private:
+        GC* _gc;
     };
 
     TEST_F(Object_Test, Equals) {

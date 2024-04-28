@@ -1,9 +1,9 @@
 #include <gtest/gtest.h>
 
-#include <test/PlxTestFixture.hpp>
+#include <tests/PlxTestFixture.hpp>
 
 #include <plx/data/List.hpp>
-#include <plx/evaluator/Evaluator.hpp>
+#include <plx/vm/VM.hpp>
 #include <plx/literal/Integer.hpp>
 #include <plx/literal/Nil.hpp>
 #include <plx/literal/PrimitiveFunction.hpp>
@@ -23,10 +23,9 @@ namespace PLX {
         }
     };
 
-    Object* prim1(Evaluator* etor, List* arguments) {
-        (void)etor;
+    void prim1(VM* vm, List* arguments) {
         PLX::arguments = arguments;
-        return GLOBALS->NilObject();
+        vm->pushObj(GLOBALS->NilObject());
     }
 
     TEST_F(PrimitiveFunction_Test, CreateInstance) {
@@ -36,11 +35,13 @@ namespace PLX {
     }
 
     TEST_F(PrimitiveFunction_Test, Apply) {
-        Evaluator* etor = new Evaluator();
+        VM* vm = new VM();
         Integer* i100 = new Integer(100);
         List* args = List::create({i100});
         PrimitiveFunction* primFunction = new PrimitiveFunction("prim1", prim1);
-        Object* value = primFunction->apply(etor, args);
+        primFunction->apply(vm, args);
+        Object* value;
+        ASSERT_TRUE(vm->popObj(value));
         EXPECT_EQ(GLOBALS->NilObject(), value);
         EXPECT_EQ(*args, *arguments);
     }

@@ -1,15 +1,17 @@
 #include <gtest/gtest.h>
 
-#include <test/PlxTestFixture.hpp>
+#include <tests/PlxTestFixture.hpp>
 
 #include <plx/data/Array.hpp>
 #include <plx/data/HashTable.hpp>
-#include <plx/evaluator/Evaluator.hpp>
 #include <plx/expr/Identifier.hpp>
+#include <plx/gc/GC.hpp>
 #include <plx/literal/Integer.hpp>
 #include <plx/literal/String.hpp>
+#include <plx/literal/Symbol.hpp>
 #include <plx/object/Globals.hpp>
 #include <plx/object/TypeIds.hpp>
+#include <plx/vm/VM.hpp>
 
 namespace PLX {
 
@@ -79,7 +81,7 @@ namespace PLX {
         EXPECT_TRUE(hash2->equals(hash1));
     }
 
-    TEST_F(HashTable_Test, Eval_Evaluator) {
+    TEST_F(HashTable_Test, Eval) {
         // bind some names to values
         Identifier* x = Identifier::create("x");
         Identifier* y = Identifier::create("y");
@@ -87,26 +89,26 @@ namespace PLX {
         Integer* i100 = new Integer(100);
         Integer* i200 = new Integer(200);
         Integer* i300 = new Integer(300);
-        Evaluator* etor = new Evaluator();
-        etor->bind(x, i100);
-        etor->bind(y, i200);
-        etor->bind(z, i300);
+        VM* vm = new VM();
+        vm->bind(x, i100);
+        vm->bind(y, i200);
+        vm->bind(z, i300);
         Identifier* a = Identifier::create("a");
         Identifier* b = Identifier::create("b");
         Identifier* c = Identifier::create("c");
         String* A = new String("A");
         String* B = new String("B");
         String* C = new String("C");
-        etor->bind(a, A);
-        etor->bind(b, B);
-        etor->bind(c, C);
+        vm->bind(a, A);
+        vm->bind(b, B);
+        vm->bind(c, C);
         // create the list to test
         HashTable* hash1 = new HashTable();
         hash1->put(a, x);
         hash1->put(b, y);
         hash1->put(c, z);
         // evaluate the list
-        Object* resObj = etor->evalExpr(hash1);
+        Object* resObj = vm->evalExpr(hash1);
         ASSERT_TRUE(resObj->isA(TypeId::D_HASHTABLE));
         HashTable* resHash = static_cast<HashTable*>(resObj);
         Object* obj;
@@ -125,15 +127,15 @@ namespace PLX {
             // the key is an unbound idetifier
             HashTable* hash1 = new HashTable();
             hash1->put(x, abc);
-            Evaluator* etor = new Evaluator();
-            EXPECT_THROW(etor->evalExpr(hash1), Array*);
+            VM* vm = new VM();
+            EXPECT_THROW(vm->evalExpr(hash1), Array*);
         }
         {
             // the value is an unbound idetifier
             HashTable* hash1 = new HashTable();
             hash1->put(abc, x);
-            Evaluator* etor = new Evaluator();
-            EXPECT_THROW(etor->evalExpr(hash1), Array*);
+            VM* vm = new VM();
+            EXPECT_THROW(vm->evalExpr(hash1), Array*);
         }
     }
 
@@ -220,7 +222,8 @@ namespace PLX {
         EXPECT_FALSE(i100->isMarked());
         EXPECT_FALSE(def->isMarked());
         EXPECT_FALSE(i200->isMarked());
-        hash1->markChildren();
+        std::vector<Object*> objs{hash1};
+        GC::mark(objs);
         EXPECT_FALSE(hash1->isMarked());
         EXPECT_TRUE(abc->isMarked());
         EXPECT_TRUE(i100->isMarked());

@@ -1,17 +1,19 @@
 #include <gtest/gtest.h>
 
-#include <test/PlxTestFixture.hpp>
+#include <tests/PlxTestFixture.hpp>
 
 #include <plx/data/Array.hpp>
 #include <plx/data/List.hpp>
 #include <plx/data/Queue.hpp>
 #include <plx/data/Triple.hpp>
-#include <plx/evaluator/Evaluator.hpp>
 #include <plx/expr/Identifier.hpp>
+#include <plx/gc/GC.hpp>
 #include <plx/literal/Integer.hpp>
 #include <plx/literal/Nil.hpp>
 #include <plx/object/Globals.hpp>
 #include <plx/object/TypeIds.hpp>
+#include <plx/vm/VM.hpp>
+#include <plx/vm/VM.hpp>
 
 namespace PLX {
 
@@ -68,30 +70,44 @@ namespace PLX {
     }
 
     TEST_F(Array_Test, Eval) {
+        GC* savedGc = GLOBALS->Gc();
+        GC gc;
+        Object::setGC(&gc);
         Identifier* x = Identifier::create("x");
         Identifier* y = Identifier::create("y");
         Identifier* z = Identifier::create("z");
         Integer* i100 = new Integer(100);
         Integer* i200 = new Integer(200);
         Integer* i300 = new Integer(300);
-        Evaluator* etor = new Evaluator();
-        etor->bind(x, i100);
-        etor->bind(y, i200);
-        etor->bind(z, i300);
+        VM* vm = new VM();
+        gc.addRoot(vm);
+        vm->bind(x, i100);
+        vm->bind(y, i200);
+        vm->bind(z, i300);
         Array* array1 = new Array({x, y, z});
-        Object* resObj = etor->evalExpr(array1);
+        Object* resObj = vm->evalExpr(array1);
         ASSERT_TRUE(resObj->isA(TypeId::D_ARRAY));
         Array* resArray = static_cast<Array*>(resObj);
         Array* expectedArray = new Array({i100, i200, i300});
         EXPECT_EQ(*expectedArray, *resArray);
+        Object::setGC(savedGc);
     }
 
     TEST_F(Array_Test, EvalUnboundIdentifier) {
+        GC* savedGc = GLOBALS->Gc();
+        GC gc;
+        Object::setGC(&gc);
         Identifier* x = Identifier::create("x");
+        std::clog << "Array_Test(1) x = " << x << "\n";
         Array* array1 = new Array({x});
-        Evaluator* etor = new Evaluator();
+        std::clog << "Array_Test(1) array1 = " << array1 << "\n";
+        VM* vm = new VM();
+        gc.addRoot(vm);
         // check that the value is an error array
-        EXPECT_THROW(etor->evalExpr(array1), Array*);
+        std::clog << "Array_Test(1) array1 = " << array1 << "\n";
+        EXPECT_THROW(vm->evalExpr(array1), Array*);
+        std::clog << "Array_Test(2) array1 = " << array1 << "\n";
+        Object::setGC(savedGc);
     }
 
     TEST_F(Array_Test, FreeVars) {
@@ -161,7 +177,8 @@ namespace PLX {
         EXPECT_FALSE(i100->isMarked());
         EXPECT_FALSE(i200->isMarked());
         EXPECT_FALSE(i300->isMarked());
-        a3->markChildren();
+        std::vector<Object*> objs{a3};
+        GC::mark(objs);
         EXPECT_FALSE(a3->isMarked());
         EXPECT_TRUE(i100->isMarked());
         EXPECT_TRUE(i200->isMarked());

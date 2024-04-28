@@ -1,29 +1,26 @@
 #include <plx/data/HashTable.hpp>
 #include <plx/literal/String.hpp>
 #include <plx/literal/Symbol.hpp>
+#include <plx/object/Object.hpp>
 #include <plx/object/Globals.hpp>
+#include <plx/object/Object.hpp>
+#include <plx/object/TypeIds.hpp>
 
 namespace PLX {
 
-    extern bool hashDebug;
-
     Symbol* Symbol::create(const std::string& name) {
-        String* stringName = new String(name);
+        InternTable* internTable = GLOBALS->SymbolInternTable();
         Object* symbolObj;
-        Symbol* symbol;
-        HashTable* internTable = GLOBALS->SymbolInternTable();
-        if (internTable->get(stringName, symbolObj)) {
-            symbol = static_cast<Symbol*>(symbolObj);
+        if (internTable->lookup(name, symbolObj)) {
+            return static_cast<Symbol*>(symbolObj);
         }
-        else {
-            symbol = new Symbol(name);
-            internTable->put(stringName, symbol);
-        }
+        Symbol* symbol = new Symbol(name);
+        internTable->add(name, symbol);
         return symbol;
     }
 
     Symbol::Symbol(const std::string& name)
-        : Symbolic(name, TypeId::L_SYMBOL)
+        : Symbolic(name)
     {}
 
     TypeId Symbol::typeId() const {

@@ -1,13 +1,13 @@
 namespace PLX {
 
-    class Evaluator;
+    class VM;
     class List;
     class Object;
 
     namespace Prim_Queue {
 
-        Object* enq(Evaluator* etor, List* args);
-        Object* deq(Evaluator* etor, List* args);
+        void enq(VM* vm, List* args);
+        void deq(VM* vm, List* args);
 
     }
 }

@@ -1,9 +1,13 @@
 #include <plx/data/Array.hpp>
+#include <plx/data/List.hpp>
 #include <plx/expr/Identifier.hpp>
+#include <plx/literal/String.hpp>
 #include <plx/literal/Symbol.hpp>
 #include <plx/object/Globals.hpp>
+#include <plx/object/Object.hpp>
 #include <plx/object/ThrowException.hpp>
 #include <plx/parser/P_Primitive.hpp>
+#include <plx/parser/Parser.hpp>
 
 namespace PLX {
 

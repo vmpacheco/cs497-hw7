@@ -2,7 +2,7 @@
 
 #include <plx/data/List.hpp>
 #include <plx/data/Queue.hpp>
-#include <plx/evaluator/Evaluator.hpp>
+#include <plx/vm/VM.hpp>
 #include <plx/literal/Nil.hpp>
 #include <plx/object/Globals.hpp>
 #include <plx/object/TypeIds.hpp>
@@ -11,18 +11,18 @@
 namespace PLX {
     namespace Prim_Queue {
 
-        Object* enq(Evaluator* etor, List* args) {
-            List* argVals = evalNArgs("enq", etor, args, {TypeId::D_QUEUE, TypeId::Z_ANY});
-            Queue* queue = static_cast<Queue*>(argVals->first());
-            Object* elem = argVals->second();
+        void enq(VM* vm, List* args) {
+            checkArgTypes("enq", args, {TypeId::D_QUEUE, TypeId::Z_ANY});
+            Queue* queue = static_cast<Queue*>(args->first());
+            Object* elem = args->second();
             queue->enq(elem);
-            return queue;
+            vm->pushObj(queue);
         }
 
-        Object* deq(Evaluator* etor, List* args) {
-            List* argVals = evalNArgs("deq", etor, args, {TypeId::D_QUEUE});
-            Queue* queue = static_cast<Queue*>(argVals->first());
-            return queue->deq();
+        void deq(VM* vm, List* args) {
+            checkArgTypes("deq", args, {TypeId::D_QUEUE});
+            Queue* queue = static_cast<Queue*>(args->first());
+            vm->pushObj(queue->deq());
         }
 
     }

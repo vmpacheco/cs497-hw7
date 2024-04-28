@@ -1,7 +1,7 @@
 namespace PLX {
 
-    class Evaluator;
+    class VM;
 
-    void definePrims(Evaluator* etor);
+    void definePrims(VM* vm);
 
 }

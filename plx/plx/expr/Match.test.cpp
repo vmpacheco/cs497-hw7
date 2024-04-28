@@ -1,16 +1,17 @@
 #include <gtest/gtest.h>
 
-#include <test/PlxTestFixture.hpp>
+#include <tests/PlxTestFixture.hpp>
 
 #include <plx/data/Array.hpp>
 #include <plx/data/Closure.hpp>
 #include <plx/data/Triple.hpp>
-#include <plx/evaluator/Evaluator.hpp>
 #include <plx/expr/Identifier.hpp>
 #include <plx/expr/Match.hpp>
+#include <plx/gc/GC.hpp>
 #include <plx/literal/Integer.hpp>
 #include <plx/literal/Nil.hpp>
 #include <plx/object/Globals.hpp>
+#include <plx/vm/VM.hpp>
 
 namespace PLX {
 
@@ -30,8 +31,8 @@ namespace PLX {
         Object* expression = i10;
         Triple* rules = new Triple(i10, i100);
         Match* match = new Match(expression, rules);
-        Evaluator* etor = new Evaluator();
-        Object* value = etor->evalExpr(match);
+        VM* vm = new VM();
+        Object* value = vm->evalExpr(match);
         ASSERT_EQ(*i100, *value);
     }
 
@@ -43,8 +44,8 @@ namespace PLX {
         Object* expression = i20;
         Triple* rules = new Triple(i10, i100, new Triple(i20, i200));
         Match* match = new Match(expression, rules);
-        Evaluator* etor = new Evaluator();
-        Object* value = etor->evalExpr(match);
+        VM* vm = new VM();
+        Object* value = vm->evalExpr(match);
         ASSERT_EQ(*i200, *value);
     }
 
@@ -57,8 +58,8 @@ namespace PLX {
         Object* expression = i30;
         Triple* rules = new Triple(i10, i100, new Triple(i20, i200));
         Match* match = new Match(expression, rules);
-        Evaluator* etor = new Evaluator();
-        ASSERT_THROW(etor->evalExpr(match), Array*);
+        VM* vm = new VM();
+        ASSERT_THROW(vm->evalExpr(match), Array*);
     }
 
     TEST_F(Match_Test, MarkChildren) {
@@ -73,7 +74,8 @@ namespace PLX {
         EXPECT_FALSE(match->isMarked());
         EXPECT_FALSE(expression->isMarked());
         EXPECT_FALSE(rules->isMarked());
-        match->markChildren();
+        std::vector<Object*> objs{match};
+        GC::mark(objs);
         EXPECT_FALSE(match->isMarked());
         EXPECT_TRUE(expression->isMarked());
         EXPECT_TRUE(rules->isMarked());

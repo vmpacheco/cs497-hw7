@@ -1,8 +1,14 @@
-#include <unordered_map>
+#include <cassert>
+#include <vector>
 
 #include <plx/data/Array.hpp>
 #include <plx/data/HashTable.hpp>
-#include <plx/evaluator/Evaluator.hpp>
+#include <plx/data/List.hpp>
+#include <plx/data/Triple.hpp>
+#include <plx/vm/VM.hpp>
+#include <plx/object/Globals.hpp>
+#include <plx/object/HashCode.hpp>
+#include <plx/object/TypeIds.hpp>
 
 namespace PLX {
 
@@ -10,6 +16,16 @@ namespace PLX {
 
     bool HashTable::boolValue() const {
         return _map.size() != 0;
+    }
+
+    Object* HashTable::close(Triple* env) {
+        HashTable* closedHashTable = new HashTable();
+        for (auto iter = _map.begin(); iter != _map.end(); iter++) {
+            Object* key = iter->first->close(env);
+            Object* value = iter->second->close(env);
+            closedHashTable->_map[key] = value;
+        }
+        return closedHashTable;
     }
 
     int HashTable::count() const {
@@ -38,16 +54,38 @@ namespace PLX {
         return true;
     }
 
-    Object* HashTable::eval(Evaluator* etor) {
-        HashTable* newHash = new HashTable();
-        for (auto iter = _map.begin(); iter != _map.end(); iter++) {
-            Object* key = iter->first;
-            Object* value = iter->second;
-            Object* newKey = etor->evalExpr(key);
-            Object* newValue = etor->evalExpr(value);
-            newHash->put(newKey, newValue);
+    class HashTableContin : public Object {
+    public:
+        HashTableContin(int nElems)
+            : _nElems {nElems}
+        {}
+        void eval(VM* vm) override {
+            HashTable* hashTable = new HashTable();
+            for (int n=0; n<_nElems; n++) {
+                Object* key;
+                assert(vm->popObj(key));
+                Object* value;
+                assert(vm->popObj(value));
+                hashTable->put(key, value);
+            }
+            vm->pushObj(hashTable);
         }
-        return newHash;
+        void showOn(std::ostream& ostream) const override {
+            ostream << "HashTableContin{" << _nElems << "}";
+        }
+        TypeId typeId() const override {
+            return TypeId::C_CONTINUATION;
+        }
+    private:
+        int _nElems;
+    };
+
+    void HashTable::eval(VM* vm) {
+        vm->pushExpr(new HashTableContin(count()));
+        for (auto iter = _map.begin(); iter != _map.end(); iter++) {
+            vm->pushExpr(iter->first);
+            vm->pushExpr(iter->second);
+        }
     }
 
     bool HashTable::get(Object* key, Object*& value) const {
@@ -62,7 +100,7 @@ namespace PLX {
     bool HashTable::index(Object* indexer, Object*& retrievedValue) {
         return get(indexer, retrievedValue);
     }
-
+    
     bool HashTable::isEmpty() const {
         return _map.empty();
     }
@@ -81,10 +119,10 @@ namespace PLX {
         return true;
     }
 
-    void HashTable::markChildren() {
+    void HashTable::markChildren(std::vector<Object*>& objs) {
         for (auto iter = _map.begin(); iter != _map.end(); iter++) {
-            iter->first->mark();
-            iter->second->mark();
+            objs.push_back(iter->first);
+            objs.push_back(iter->second);
         }
     }
 

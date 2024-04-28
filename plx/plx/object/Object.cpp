@@ -1,10 +1,19 @@
+#include <cassert>
 #include <list>
 #include <sstream>
 
 #include <plx/data/Array.hpp>
+#include <plx/data/List.hpp>
+#include <plx/data/Queue.hpp>
+#include <plx/data/Triple.hpp>
+#include <plx/vm/VM.hpp>
+#include <plx/gc/GC.hpp>
+#include <plx/literal/String.hpp>
 #include <plx/literal/Symbol.hpp>
+#include <plx/object/HashCode.hpp>
 #include <plx/object/Object.hpp>
 #include <plx/object/ThrowException.hpp>
+#include <plx/object/TypeIds.hpp>
 
 namespace PLX {
 
@@ -12,6 +21,9 @@ namespace PLX {
         object->showOn(ostream);
         return ostream;
     }
+
+    // This is set to an actual value in Globals.
+    GC* Object::_gc = nullptr;
 
     bool Object::operator==(const Object& rhs) const {
         return this->equals(&rhs);
@@ -25,20 +37,27 @@ namespace PLX {
         return !this->equals(&rhs);
     }
 
-    Object::Object() {
+    void Object::setGC(GC* gc) {
+        Object::_gc = gc;
     }
 
-    Object* Object::apply(Evaluator* etor, List* arguments) {
-        (void)etor;
+    Object::Object() {
+        Object::_gc->registerObject(this);
+    }
+
+    void Object::apply(VM* vm, List* arguments) {
+        (void)vm;
         (void)arguments;
         throwException("Object::apply", "Object is not applyable", this);
-        // This function won't ever return anything, but by putting a
-        // return statement here it prevents a compiler warning.
-        return this;
     }
 
     bool Object::boolValue() const {
         return true;
+    }
+
+    Object* Object::close(Triple* env) {
+        (void)env;
+        return this;
     }
 
     void Object::displayOn(std::ostream& ostream) const {
@@ -46,17 +65,15 @@ namespace PLX {
     }
 
     bool Object::equals(const Object* other) const {
-        // The pointers must be cast to void* in case the == operator is
-        // ever in the future overloaded to handle Object*.
+        // Cast the pointers to void* to ensure that the overloaded
+        // operator==(Object*) functino is not called.
         const void* thisPtr = static_cast<const void*>(this);
         const void* otherPtr = static_cast<const void*>(other);
         return thisPtr == otherPtr;
     }
 
-    Object* Object::eval(Evaluator* etor) {
-        (void)etor;
-        // by default an object evaluates to itself
-        return this;
+    void Object::eval(VM* vm) {
+        vm->pushObj(this);
     }
 
     List* Object::freeVars(List* freeVars) {
@@ -97,11 +114,18 @@ namespace PLX {
         return false;
     }
 
-    void Object::mark() {
+    void Object::mark(std::vector<Object*>& objs) {
         if (!_isMarked) {
             _isMarked = true;
-            markChildren();
+            markChildren(objs);
         }
+    }
+
+    // See also Object::unmark()
+    bool Object::setMark(bool markValue) {
+        bool isMarked = _isMarked;
+        _isMarked = markValue;
+        return isMarked;
     }
 
     bool Object::match(Object* other, Triple*& bindings) {
@@ -109,7 +133,9 @@ namespace PLX {
         return this->equals(other);
     }
 
-    void Object::markChildren() {}
+    void Object::markChildren(std::vector<Object*>& objs) {
+        (void)objs;
+    }
 
     bool Object::plus(Object* other, Object*& value) {
         (void)other;
@@ -171,16 +197,11 @@ namespace PLX {
     }
 
     std::string Object::typeName() const {
-        // return "Object";
         return TYPE_NAMES[typeId()];
     }
 
     Symbol* Object::typeSymbol() const {
         return Symbol::create(typeName());
-    }
-
-    void Object::unmark() {
-        _isMarked = false;
     }
 
 }

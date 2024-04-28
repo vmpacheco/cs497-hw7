@@ -1,15 +1,16 @@
 #include <gtest/gtest.h>
 
-#include <test/PlxTestFixture.hpp>
+#include <tests/PlxTestFixture.hpp>
 
 #include <plx/data/List.hpp>
 #include <plx/data/Method.hpp>
-#include <plx/evaluator/Evaluator.hpp>
 #include <plx/expr/Identifier.hpp>
+#include <plx/gc/GC.hpp>
 #include <plx/literal/Integer.hpp>
 #include <plx/object/Globals.hpp>
 #include <plx/object/Object.hpp>
 #include <plx/object/TypeIds.hpp>
+#include <plx/vm/VM.hpp>
 
 namespace PLX {
 
@@ -30,8 +31,11 @@ namespace PLX {
         List* list1 = List::create({i100, i200, i300});
         Identifier* length = Identifier::create("length");
         Method* method1 = new Method(list1, length);
-        Evaluator* etor = new Evaluator();
-        Object* res = method1->apply(etor, GLOBALS->EmptyList());
+        VM* vm = new VM();
+        method1->apply(vm, GLOBALS->EmptyList());
+        while (vm->step());
+        Object* res;
+        ASSERT_TRUE(vm->popObj(res));
         Object* expectedRes = new Integer(3);
         EXPECT_EQ(*expectedRes, *res);
     }
@@ -40,8 +44,8 @@ namespace PLX {
         Identifier* a = Identifier::create("a");
         Identifier* b = Identifier::create("b");
         Method* method1 = new Method(a, b);
-        Evaluator* etor = new Evaluator();
-        Object* res = method1->eval(etor);
+        VM* vm = new VM();
+        Object* res = vm->evalExpr(method1);
         EXPECT_EQ(method1, res);
     }
 
@@ -65,7 +69,8 @@ namespace PLX {
         EXPECT_FALSE(method1->isMarked());
         EXPECT_FALSE(i100->isMarked());
         EXPECT_FALSE(x->isMarked());
-        method1->markChildren();
+        std::vector<Object*> objs{method1};
+        GC::mark(objs);
         EXPECT_FALSE(method1->isMarked());
         EXPECT_TRUE(i100->isMarked());
         EXPECT_TRUE(x->isMarked());

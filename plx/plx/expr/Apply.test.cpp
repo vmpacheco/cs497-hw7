@@ -1,16 +1,17 @@
 #include <gtest/gtest.h>
 
-#include <test/PlxTestFixture.hpp>
-#include <test/TestUtils.hpp>
+#include <tests/PlxTestFixture.hpp>
+#include <tests/TestUtils.hpp>
 
 #include <plx/data/Array.hpp>
 #include <plx/data/List.hpp>
 #include <plx/data/Triple.hpp>
-#include <plx/evaluator/Evaluator.hpp>
 #include <plx/expr/Apply.hpp>
 #include <plx/expr/Function.hpp>
 #include <plx/expr/Identifier.hpp>
+#include <plx/gc/GC.hpp>
 #include <plx/literal/Integer.hpp>
+#include <plx/vm/VM.hpp>
 
 namespace PLX {
 
@@ -33,9 +34,9 @@ namespace PLX {
         Function* fun1 = new Function(parameters, body);
         List* args = new List(i100);
         Apply* app1 = new Apply(fun1, args);
-        Evaluator* etor = new Evaluator();
-        etor->bind(y, i200);
-        Object* value = etor->evalExpr(app1);
+        VM* vm = new VM();
+        vm->bind(y, i200);
+        Object* value = vm->evalExpr(app1);
         Array* expectedArray = new Array({i100, i200});
         EXPECT_TRUE(value->equals(expectedArray));
     }
@@ -45,11 +46,12 @@ namespace PLX {
         Identifier* y = Identifier::create("y");
         List* arguments = new List(y);
         Apply* app1 = new Apply(x, arguments);
-        EXPECT_FALSE(app1->isMarked());
-        EXPECT_FALSE(arguments->isMarked());
-        EXPECT_FALSE(x->isMarked());
-        EXPECT_FALSE(y->isMarked());
-        app1->markChildren();
+        ASSERT_FALSE(app1->isMarked());
+        ASSERT_FALSE(arguments->isMarked());
+        ASSERT_FALSE(x->isMarked());
+        ASSERT_FALSE(y->isMarked());
+        std::vector<Object*> objs{app1};
+        GC::mark(objs);
         EXPECT_FALSE(app1->isMarked());
         EXPECT_TRUE(arguments->isMarked());
         EXPECT_TRUE(x->isMarked());

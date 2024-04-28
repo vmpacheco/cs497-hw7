@@ -1,5 +1,4 @@
 #include <cassert>
-#include <functional>  // for std::hash
 #include <sstream>
 #include <string>
 #include <string.h>  // for strncmp
@@ -9,8 +8,10 @@
 #include <plx/literal/Integer.hpp>
 #include <plx/literal/String.hpp>
 #include <plx/literal/Symbol.hpp>
+#include <plx/object/HashCode.hpp>
+#include <plx/object/Object.hpp>
 #include <plx/object/ThrowException.hpp>
-
+#include <plx/object/TypeIds.hpp>
 
 namespace PLX {
 

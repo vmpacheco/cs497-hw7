@@ -6,6 +6,7 @@
 #include <plx/expr/Identifier.hpp>
 #include <plx/expr/NamedFunction.hpp>
 #include <plx/literal/Nil.hpp>
+#include <plx/object/Globals.hpp>
 #include <plx/object/ThrowException.hpp>
 #include <plx/parser/expr/P_Expr.hpp>
 #include <plx/parser/P_Primitive.hpp>
@@ -76,7 +77,7 @@ namespace PLX {
             rule = nextRule;
         }
         // determine if the function is named or anonymous
-        if (nameObj == GLOBALS->NilObject()) {
+        if (nameObj->isA(TypeId::L_NIL)) {
             value = function;
         }
         else {

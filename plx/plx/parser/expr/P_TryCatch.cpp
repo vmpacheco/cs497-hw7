@@ -2,11 +2,15 @@
 
 #include <plx/data/Array.hpp>
 #include <plx/data/Queue.hpp>
+#include <plx/data/Triple.hpp>
 #include <plx/expr/TryCatch.hpp>
 #include <plx/literal/Nil.hpp>
+#include <plx/literal/String.hpp>
+#include <plx/object/Globals.hpp>
 #include <plx/object/ThrowException.hpp>
 #include <plx/parser/P_Primitive.hpp>
 #include <plx/parser/P_ReservedWords.hpp>
+#include <plx/parser/Parser.hpp>
 
 namespace PLX {
 

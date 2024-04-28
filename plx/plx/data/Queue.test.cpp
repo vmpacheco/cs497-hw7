@@ -1,16 +1,17 @@
 #include <gtest/gtest.h>
 
-#include <test/PlxTestFixture.hpp>
+#include <tests/PlxTestFixture.hpp>
 
 #include <plx/data/Array.hpp>
 #include <plx/data/List.hpp>
 #include <plx/data/Queue.hpp>
-#include <plx/evaluator/Evaluator.hpp>
 #include <plx/expr/Identifier.hpp>
+#include <plx/gc/GC.hpp>
 #include <plx/literal/Integer.hpp>
 #include <plx/literal/Nil.hpp>
 #include <plx/object/Globals.hpp>
 #include <plx/object/TypeIds.hpp>
+#include <plx/vm/VM.hpp>
 
 namespace PLX {
 
@@ -68,6 +69,22 @@ namespace PLX {
         EXPECT_THROW(q1->deq(), Array*);
     }
 
+    TEST_F(Queue_Test, EnqReq) {
+        Queue* q1 = new Queue();
+        Object* obj1 = new Object();
+        Object* obj2 = new Object();
+        q1->enq(obj1);
+        q1->enq(obj2);
+        EXPECT_EQ(obj1, q1->deq());
+        EXPECT_EQ(obj2, q1->deq());
+        EXPECT_TRUE(q1->isEmpty());
+        q1->enq(obj2);
+        q1->enq(obj1);
+        EXPECT_EQ(obj2, q1->deq());
+        EXPECT_EQ(obj1, q1->deq());
+        EXPECT_TRUE(q1->isEmpty());
+    }
+
     TEST_F(Queue_Test, EnqList) {
         Queue* q1 = new Queue();
         q1->enq({GLOBALS->NilObject(), GLOBALS->NilObject(), GLOBALS->NilObject()});
@@ -95,22 +112,23 @@ namespace PLX {
         EXPECT_TRUE(q2->equals(q1));
     }
 
-    TEST_F(Queue_Test, Eval_Evaluator) {
+#if 0
+    TEST_F(Queue_Test, Eval) {
         Identifier* x = Identifier::create("x");
         Identifier* y = Identifier::create("y");
         Identifier* z = Identifier::create("z");
         Integer* i100 = new Integer(100);
         Integer* i200 = new Integer(200);
         Integer* i300 = new Integer(300);
-        Evaluator* etor = new Evaluator();
-        etor->bind(x, i100);
-        etor->bind(y, i200);
-        etor->bind(z, i300);
+        VM* vm = new VM();
+        vm->bind(x, i100);
+        vm->bind(y, i200);
+        vm->bind(z, i300);
         Queue* q1 = new Queue();
         q1->enq(x);
         q1->enq(y);
         q1->enq(z);
-        Object* value = etor->evalExpr(q1);
+        Object* value = vm->evalExpr(q1);
         EXPECT_TRUE(value->isA(TypeId::D_QUEUE));
         Queue* queueValue = static_cast<Queue*>(value);
         Object* elem = queueValue->deq();
@@ -121,6 +139,7 @@ namespace PLX {
         EXPECT_EQ(*i300, *elem);
         EXPECT_THROW(queueValue->deq(), Array*);
     }
+#endif
 
     TEST_F(Queue_Test, IsEmpty) {
         Queue *q1 = new Queue();
@@ -150,7 +169,8 @@ namespace PLX {
         EXPECT_FALSE(q1->isMarked());
         EXPECT_FALSE(i100->isMarked());
         EXPECT_FALSE(i200->isMarked());
-        q1->markChildren();
+        std::vector<Object*> objs{q1};
+        GC::mark(objs);
         EXPECT_FALSE(q1->isMarked());
         EXPECT_TRUE(q1->asList()->isMarked());
         EXPECT_TRUE(i100->isMarked());

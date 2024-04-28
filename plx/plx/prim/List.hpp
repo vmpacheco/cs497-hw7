@@ -1,17 +1,17 @@
 
 namespace PLX {
 
-    class Evaluator;
+    class VM;
     class List;
     class Object;
 
     namespace Prim_List {
 
-        Object* asArray(Evaluator* etor, List* args);
-        Object* first(Evaluator* etor, List* args);
-        Object* rest(Evaluator* etor, List* args);
-        Object* setFirst(Evaluator* etor, List* args);
-        Object* setRest(Evaluator* etor, List* args);
+        void asArray(VM* vm, List* args);
+        void first(VM* vm, List* args);
+        void rest(VM* vm, List* args);
+        void setFirst(VM* vm, List* args);
+        void setRest(VM* vm, List* args);
 
     }
 }

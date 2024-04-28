@@ -1,12 +1,18 @@
 #include <cassert>
 #include <list>
+#include <vector>
 
 #include <plx/data/Array.hpp>
 #include <plx/data/List.hpp>
 #include <plx/data/Queue.hpp>
-#include <plx/evaluator/Evaluator.hpp> 
+#include <plx/vm/VM.hpp> 
 #include <plx/literal/Nil.hpp>
+#include <plx/literal/String.hpp>
+#include <plx/object/Globals.hpp>
+#include <plx/object/HashCode.hpp>
+#include <plx/object/Object.hpp>
 #include <plx/object/ThrowException.hpp>
+#include <plx/object/TypeIds.hpp>
 
 namespace PLX {
 
@@ -45,6 +51,13 @@ namespace PLX {
         return this != GLOBALS->EmptyList();
     }
 
+    Object* List::close(Triple* env) {
+        if (isEmpty()) {
+            return this;
+        }
+        return new List(_first->close(env), _rest->close(env));
+    }
+
     bool List::equals(const Object* other) const {
         if (this == other) {
             return true;
@@ -59,13 +72,34 @@ namespace PLX {
         return false;
     }
 
-    Object* List::eval(Evaluator* etor) {
-        if (isEmpty()) {
-            return this;
+    class ListContin : public Object {
+    public:
+        ListContin() {}
+        void eval(VM* vm) override {
+            Object* first;
+            assert(vm->popObj(first));
+            Object* rest;
+            assert(vm->popObj(rest));
+            List* newList = new List(first, rest);
+            vm->pushObj(newList);
         }
-        Object* firstValue = etor->evalExpr(_first);
-        Object* restValue = etor->evalExpr(_rest);
-        return new List(firstValue, restValue);
+        void showOn(std::ostream& ostream) const override {
+            ostream << "ListContin{}";
+        }
+        TypeId typeId() const override {
+            return TypeId::C_CONTINUATION;
+        }
+    };
+
+    void List::eval(VM* vm) {
+        if (isEmpty()) {
+            vm->pushObj(this);
+        }
+        else {
+            vm->pushExpr(new ListContin());
+            vm->pushExpr(_first);
+            vm->pushExpr(_rest);
+        }
     }
 
     Object* List::first() {
@@ -151,6 +185,31 @@ namespace PLX {
         return list;
     }
 
+    void List::markChildren(std::vector<Object*>& objs) {
+        if (isEmpty()) {
+            return;
+        }
+        objs.push_back(_first);
+        objs.push_back(_rest);
+    }
+
+    bool List::match(Object* other, Triple*& bindings) {
+        if (!other->isA(TypeId::D_LIST)) {
+            return false;
+        }
+        List* otherList = static_cast<List*>(other);
+        if (isEmpty()) {
+            return otherList->isEmpty();
+        }
+        if (otherList->isEmpty()) {
+            return false;
+        }
+        if (!_first->match(otherList->_first, bindings)) {
+            return false;
+        }
+        return _rest->match(otherList->_rest, bindings);
+    }
+
     Object* List::rest() {
         if (isEmpty()) {
             throwException("List", "List is empty", this);
@@ -181,20 +240,6 @@ namespace PLX {
         return reversed;
     }
 
-    bool List::match(Object* other, Triple*& bindings) {
-        if (!other->isA(TypeId::D_LIST)) {
-            return false;
-        }
-        List* otherList = static_cast<List*>(other);
-        if (isEmpty()) {
-            return otherList->isEmpty();
-        }
-        if (!_first->match(otherList->_first, bindings)) {
-            return false;
-        }
-        return _rest->match(otherList->_rest, bindings);
-    }
-
     Object* List::second() {
         return restAsList()->_first;
     }
@@ -215,11 +260,6 @@ namespace PLX {
              throwException("List", "Operation not allowed on empty list", this);
         }
         _rest = rest;
-    }
-
-    void List::markChildren() {
-        _first->mark();
-        _rest->mark();
     }
 
     void List::showOn(std::ostream& ostream) const {

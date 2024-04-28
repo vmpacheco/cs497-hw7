@@ -1,17 +1,18 @@
 #include <gtest/gtest.h>
 
-#include <test/PlxTestFixture.hpp>
+#include <tests/PlxTestFixture.hpp>
 
 #include <plx/data/Array.hpp>
 #include <plx/data/List.hpp>
 #include <plx/data/Queue.hpp>
 #include <plx/data/Triple.hpp>
-#include <plx/evaluator/Evaluator.hpp>
 #include <plx/expr/Identifier.hpp>
+#include <plx/gc/GC.hpp>
 #include <plx/literal/Integer.hpp>
 #include <plx/literal/Nil.hpp>
 #include <plx/object/Globals.hpp>
 #include <plx/object/TypeIds.hpp>
+#include <plx/vm/VM.hpp>
 
 namespace PLX {
 
@@ -54,16 +55,16 @@ namespace PLX {
         EXPECT_FALSE(list1->equals(list3));
     }
 
-    TEST_F(List_Test, Eval_Evaluator) {
+    TEST_F(List_Test, Eval) {
         Identifier* x = Identifier::create("x");
         Identifier* y = Identifier::create("y");
         Integer* i100 = new Integer(100);
         Integer* i200 = new Integer(200);
-        Evaluator* etor = new Evaluator();
-        etor->bind(x, i100);
-        etor->bind(y, i200);
+        VM* vm = new VM();
+        vm->bind(x, i100);
+        vm->bind(y, i200);
         List* list1 = new List(x, new List(y));
-        Object* value = etor->evalExpr(list1);
+        Object* value = vm->evalExpr(list1);
         ASSERT_TRUE(value->isA(TypeId::D_LIST));
         List* listValue = static_cast<List*>(value);
         List* expectedList = new List(i100, new List(i200));
@@ -136,7 +137,8 @@ namespace PLX {
         EXPECT_FALSE(list1->isMarked());
         EXPECT_FALSE(i100->isMarked());
         EXPECT_FALSE(i200->isMarked());
-        list2->markChildren();
+        std::vector<Object*> objs{list2};
+        GC::mark(objs);
         EXPECT_FALSE(list2->isMarked());
         EXPECT_TRUE(list1->isMarked());
         EXPECT_TRUE(i100->isMarked());

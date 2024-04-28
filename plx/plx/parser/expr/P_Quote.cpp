@@ -1,4 +1,6 @@
+#include <plx/data/List.hpp>
 #include <plx/expr/Quote.hpp>
+#include <plx/object/Object.hpp>
 #include <plx/parser/P_Primitive.hpp>
 #include <plx/parser/P_SpecialChars.hpp>
 

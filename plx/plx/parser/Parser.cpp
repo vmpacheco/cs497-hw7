@@ -1,6 +1,8 @@
 #include <cassert>
 
 #include <plx/data/Array.hpp>
+#include <plx/data/List.hpp>
+#include <plx/literal/Nil.hpp>
 #include <plx/literal/Symbol.hpp>
 #include <plx/object/Globals.hpp>
 #include <plx/parser/Parser.hpp>

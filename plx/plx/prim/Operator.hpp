@@ -1,19 +1,19 @@
 namespace PLX {
 
-    class Evaluator;
+    class VM;
     class List;
     class Object;
 
     namespace Prim_Operator {
 
-        Object* bind(Evaluator* etor, List* args);
-        Object* divide(Evaluator* etor, List* args);
-        Object* dot(Evaluator* etor, List* args);
-        Object* equalTo(Evaluator* etor, List* args);
-        Object* minus(Evaluator* etor, List* args);
-        Object* plus(Evaluator* etor, List* args);
-        Object* times(Evaluator* etor, List* args);
-        Object* percent(Evaluator* etor, List* args);
+        void bind(VM* vm, List* args);
+        void divide(VM* vm, List* args);
+        void dot(VM* vm, List* args);
+        void equalTo(VM* vm, List* args);
+        void minus(VM* vm, List* args);
+        void plus(VM* vm, List* args);
+        void times(VM* vm, List* args);
+        void percent(VM* vm, List* args);
 
     }
 }

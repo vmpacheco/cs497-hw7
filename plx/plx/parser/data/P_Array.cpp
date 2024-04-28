@@ -1,8 +1,11 @@
 #include <cassert>
 
 #include <plx/data/Array.hpp>
+#include <plx/data/List.hpp>
 #include <plx/data/Queue.hpp>
+#include <plx/object/Object.hpp>
 #include <plx/parser/P_Primitive.hpp>
+#include <plx/parser/P_SpecialChars.hpp>
 
 namespace PLX {
 

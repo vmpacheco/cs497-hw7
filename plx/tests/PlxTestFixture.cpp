@@ -1,5 +1,5 @@
 #include <plx/object/Globals.hpp>
-#include <test/PlxTestFixture.hpp>
+#include <tests/PlxTestFixture.hpp>
 
 namespace PLX {
 

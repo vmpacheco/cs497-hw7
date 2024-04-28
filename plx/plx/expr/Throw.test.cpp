@@ -1,14 +1,15 @@
 #include <gtest/gtest.h>
 
-#include <test/PlxTestFixture.hpp>
+#include <tests/PlxTestFixture.hpp>
 
 #include <plx/data/List.hpp>
-#include <plx/evaluator/Evaluator.hpp>
 #include <plx/expr/Throw.hpp>
+#include <plx/gc/GC.hpp>
 #include <plx/literal/Integer.hpp>
 #include <plx/literal/Nil.hpp>
 #include <plx/object/Globals.hpp>
 #include <plx/object/TypeIds.hpp>
+#include <plx/vm/VM.hpp>
 
 namespace PLX {
 
@@ -21,9 +22,9 @@ namespace PLX {
     }
 
     TEST_F(Throw_Test, Eval) {
-        Evaluator* etor = new Evaluator();
+        VM* vm = new VM();
         Throw* throwExpr = new Throw(GLOBALS->NilObject());
-        EXPECT_THROW(etor->evalExpr(throwExpr), Object*);
+        EXPECT_THROW(vm->evalExpr(throwExpr), Object*);
     }
 
     TEST_F(Throw_Test, MarkChildren) {
@@ -31,7 +32,8 @@ namespace PLX {
         Throw* throwExpr = new Throw(i100);
         EXPECT_FALSE(throwExpr->isMarked());
         EXPECT_FALSE(i100->isMarked());
-        throwExpr->markChildren();
+        std::vector<Object*> objs{throwExpr};
+        GC::mark(objs);
         EXPECT_FALSE(throwExpr->isMarked());
         EXPECT_TRUE(i100->isMarked());
     }

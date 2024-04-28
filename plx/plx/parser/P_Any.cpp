@@ -7,8 +7,11 @@
 #include <plx/expr/BinOpExpr.hpp>
 #include <plx/expr/Identifier.hpp>
 #include <plx/expr/IndexOp.hpp>
+#include <plx/object/TypeIds.hpp>
 #include <plx/parser/P_Primitive.hpp>
+#include <plx/parser/P_SpecialChars.hpp>
 #include <plx/parser/expr/P_Expr.hpp>
+#include <plx/parser/Parser.hpp>
 #include <plx/object/ThrowException.hpp>
 
 namespace PLX {
@@ -43,43 +46,43 @@ namespace PLX {
     }
 
     bool pEqualOp(List*& tokens, Object*& value) {
-        Identifier* oper {Identifier::create("=")};
+        static Identifier* oper {Identifier::create("=")};
         bool res = pSpotOperator(oper, tokens, value);
         return res;
     }
 
     bool pEqualToOp(List*& tokens, Object*& value) {
-        Identifier* oper {Identifier::create("==")};
+        static Identifier* oper {Identifier::create("==")};
         return pSpotOperator(oper, tokens, value);
     }
 
     bool pPlusOp(List*& tokens, Object*& value) {
-        Identifier* oper {Identifier::create("+")};
+        static Identifier* oper {Identifier::create("+")};
         return pSpotOperator(oper, tokens, value);
     }
 
     bool pMinusOp(List*& tokens, Object*& value) {
-        Identifier* oper {Identifier::create("-")};
+        static Identifier* oper {Identifier::create("-")};
         return pSpotOperator(oper, tokens, value);
     }
 
     bool pMultiplyOp(List*& tokens, Object*& value) {
-        Identifier* oper {Identifier::create("*")};
+        static Identifier* oper {Identifier::create("*")};
         return pSpotOperator(oper, tokens, value);
     }
 
     bool pDivideOp(List*& tokens, Object*& value) {
-        Identifier* oper {Identifier::create("/")};
+        static Identifier* oper {Identifier::create("/")};
         return pSpotOperator(oper, tokens, value);
     }
 
     bool pModOp(List*& tokens, Object*& value) {
-        Identifier* oper {Identifier::create("%")};
+        static Identifier* oper {Identifier::create("%")};
         return pSpotOperator(oper, tokens, value);
     }
     
     bool pDotOp(List*& tokens, Object*& value) {
-        Identifier* oper {Identifier::create(".")};
+        static Identifier* oper {Identifier::create(".")};
         return pSpotOperator(oper, tokens, value);
     }
 

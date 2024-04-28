@@ -3,6 +3,7 @@
 #include <cassert>
 #include <iostream>
 #include <list>
+#include <vector>
 
 #include <plx/object/HashCode.hpp>
 #include <plx/object/TypeIds.hpp>
@@ -12,12 +13,12 @@ namespace PLX {
     enum class TypeId;
 
     class Array;
-    class Evaluator;
     class GC;
     class List;
     class Queue;
     class Symbol;
     class Triple;
+    class VM;
 
     class Object {
     public:
@@ -26,17 +27,17 @@ namespace PLX {
         Object();
         virtual ~Object() = default;
 
-        virtual Object* apply(Evaluator* etor, List* arguments);
-        virtual bool boolValue() const;
+        virtual void apply(VM* vm, List* arguments);
+        virtual bool boolValue() const;  // DEPRECATED
+        virtual Object* close(Triple* env);
         virtual void displayOn(std::ostream& ostream) const;
         virtual bool equals(const Object* other) const;
-        virtual Object* eval(Evaluator* etor);
+        virtual void eval(VM* vm);
         virtual List* freeVars(List* freeVars);
-        static List* freeVars(std::initializer_list<Object*> objs, List* freeVars);
         virtual bool hashCode(HashCode& hashCode);
         virtual bool index(Object* indexer, Object*& retrievedValue);
         virtual bool length(int& len);
-        virtual void markChildren();
+        virtual void markChildren(std::vector<Object*>& objs);
         virtual bool match(Object* other, Triple*& bindings);
         virtual TypeId typeId() const;
 
@@ -53,16 +54,19 @@ namespace PLX {
         virtual bool divide(Object* other, Object*& value);
         virtual bool percent(Object* other, Object*& value);
 
+        static List* freeVars(std::initializer_list<Object*> objs, List* freeVars);
+
         bool isA(TypeId typeId) const;
         bool isMarked() const;
-        void mark();
+        void mark(std::vector<Object*>& objs);
+        bool setMark(bool markValue);
+
         std::string toString();
         std::string typeName() const;
         Symbol* typeSymbol() const;
-        void unmark();
 
         bool operator==(const Object& rhs) const;
-        bool operator==(const Object* other) const;
+        bool operator==(const Object* rhs) const;
         bool operator!=(const Object& rhs) const;
 
     private:
@@ -74,7 +78,6 @@ namespace PLX {
     // This operator can't be a member function because the first
     // parameter is an ostream and not an Object.
     std::ostream& operator<<(std::ostream& ostream, const PLX::Object* object);
-
 }
 
 namespace std {

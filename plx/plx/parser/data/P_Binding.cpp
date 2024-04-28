@@ -4,10 +4,16 @@
 #include <plx/data/Array.hpp>
 #include <plx/data/Queue.hpp>
 #include <plx/data/Triple.hpp>
+#include <plx/literal/String.hpp>
+#include <plx/literal/Symbol.hpp>
+#include <plx/object/Globals.hpp>
+#include <plx/object/Object.hpp>
 #include <plx/object/ThrowException.hpp>
+#include <plx/object/TypeIds.hpp>
 #include <plx/parser/data/P_Data.hpp>
 #include <plx/parser/expr/P_Expr.hpp>
 #include <plx/parser/literal/P_Literal.hpp>
+#include <plx/parser/P_Primitive.hpp>
 #include <plx/parser/P_SpecialChars.hpp>
 #include <plx/parser/Parser.hpp>
 #include <plx/parser/P_Any.hpp>

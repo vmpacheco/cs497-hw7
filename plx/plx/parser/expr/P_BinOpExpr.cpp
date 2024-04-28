@@ -4,19 +4,29 @@
 #include <plx/data/Queue.hpp>
 #include <plx/expr/BinOpExpr.hpp>
 #include <plx/expr/Identifier.hpp>
+#include <plx/literal/String.hpp>
 #include <plx/object/ThrowException.hpp>
 #include <plx/parser/literal/P_Literal.hpp>
+#include <plx/parser/P_Primitive.hpp>
+#include <plx/parser/Parser.hpp>
 #include <plx/parser/data/P_Data.hpp>
 
 namespace PLX {
 
-    /*
+/*
     ops1 = [':=', '~', '==', '!=', '<', '>', '<=', '>=', '##', '=', ':?']
     ops2 = ['+', '-', '::', ':>', '++', '+++', '#+', '#-']
     ops3 = ['*', '/', '%', '#*', '#/']
     ops4 = ['^']
     ops5 = ['.', ':']
-    */
+
+    self.add('binop', MakeBinOpParser(SepBy(1, 'lvl2', OneOf(*ops1), 'exprErr', True)))
+    self.add('lvl2', MakeBinOpParser(SepBy(1, 'lvl3', OneOf(*ops2), 'exprErr', True)))
+    self.add('lvl3', MakeBinOpParser(SepBy(1, 'lvl4', OneOf(*ops3), 'exprErr', True)))
+    self.add('lvl4', MakeBinOpParser(SepBy(1, 'lvl5', OneOf(*ops4), 'exprErr', True)))
+    self.add('lvl5', MakeBinOpParser(SepBy(1, 'lvl6', OneOf(*ops5), 'exprErr', True)))
+    self.add('lvl6', OneOf('construct', 'container', 'literal'))
+*/
 
     bool pSpotOperator(List*& tokens, Object*& value) {
         Object* operatorToken;

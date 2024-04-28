@@ -1,8 +1,10 @@
 #include <plx/data/List.hpp>
-#include <plx/evaluator/Evaluator.hpp>
+#include <plx/vm/VM.hpp>
 #include <plx/expr/Apply.hpp>
 #include <plx/expr/BinOpExpr.hpp>
 #include <plx/expr/Identifier.hpp>
+#include <plx/object/TypeIds.hpp>
+#include <plx/object/TypeIds.hpp>
 
 namespace PLX {
 
@@ -13,16 +15,22 @@ namespace PLX {
         , _apply {new Apply(oper, List::create({lhs, rhs}))}
     {}
 
-    Object* BinOpExpr::eval(Evaluator* etor) {
-        Object* res = etor->evalExpr(_apply);
-        return res;
+    Object* BinOpExpr::close(Triple* env) {
+        Object* lhs = _lhs->close(env);
+        Object* oper = _operator->close(env);
+        Object* rhs = _rhs->close(env);
+        return new Apply(oper, List::create({lhs, rhs}));
     }
 
-    void BinOpExpr::markChildren() {
-        _lhs->mark();
-        _operator->mark();
-        _rhs->mark();
-        _apply->mark();
+    void BinOpExpr::eval(VM* vm) {
+        vm->pushExpr(_apply);
+    }
+
+    void BinOpExpr::markChildren(std::vector<Object*>& objs) {
+        objs.push_back(_lhs);
+        objs.push_back(_operator);
+        objs.push_back(_rhs);
+        objs.push_back(_apply);
     }
 
     void BinOpExpr::showOn(std::ostream& ostream) const {

@@ -1,7 +1,14 @@
+#include <cassert>
+
+#include <plx/data/Triple.hpp>
 #include <plx/data/List.hpp>
-#include <plx/evaluator/Evaluator.hpp>
+#include <plx/vm/VM.hpp>
 #include <plx/expr/Do.hpp>
+#include <plx/expr/Drop.hpp>
+#include <plx/expr/RestoreEnv.hpp>
 #include <plx/literal/Nil.hpp>
+#include <plx/object/Globals.hpp>
+#include <plx/object/TypeIds.hpp>
 
 namespace PLX {
 
@@ -10,21 +17,42 @@ namespace PLX {
         , _reverseExprs {exprs->reverse()}
     {}
 
-    Object* Do::eval(Evaluator* etor) {
-        Object* value = GLOBALS->NilObject();
-        List* exprs = _exprs;
-        Triple* savedEnv = etor->environment();
-        while (!exprs->isEmpty()) {
-            Object* expr = exprs->first();
-            value = etor->evalExpr(expr);
-            exprs = exprs->restAsList();
+    Object* Do::close(Triple* env) {
+        List* exprs = static_cast<List*>(_exprs->close(env));
+        if (exprs->isEmpty()) {
+            return GLOBALS->NilObject();
         }
-        etor->setEnvironment(savedEnv);
-        return value;
+        if (exprs->restAsList()->isEmpty()) {
+            return exprs->first();
+        }
+        return exprs;
     }
 
-    void Do::markChildren() {
-        _exprs->mark();
+    void Do::eval(VM* vm) {
+        if (_reverseExprs->isEmpty()) {
+            vm->pushObj(GLOBALS->NilObject());
+        }
+        else {
+            RestoreEnv::pushContin(vm->environment(), vm);
+            bool firstIter = true;
+            Drop* drop = new Drop();
+            List* exprs = _reverseExprs;
+            while (!exprs->isEmpty()) {
+                if (firstIter) {
+                    firstIter = false;
+                }
+                else {
+                    vm->pushExpr_dynamic(drop);
+                }
+                vm->pushExpr_dynamic(exprs->first());
+                exprs = exprs->restAsList();
+            }
+        }
+    }
+
+    void Do::markChildren(std::vector<Object*>& objs) {
+        (void)objs;
+        // TODO
     }
 
     void Do::showOn(std::ostream& ostream) const {

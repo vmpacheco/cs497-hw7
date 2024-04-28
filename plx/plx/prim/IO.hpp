@@ -1,15 +1,15 @@
 namespace PLX {
 
-    class Evaluator;
+    class VM;
     class List;
     class Object;
 
     namespace Prim_IO {
 
-        Object* display(Evaluator* etor, List* args);
-        Object* nl(Evaluator* etor, List* args);
-        Object* readLine(Evaluator* etor, List* args);
-        Object* show(Evaluator* etor, List* args);
+        void display(VM* vm, List* args);
+        void nl(VM* vm, List* args);
+        void readLine(VM* vm, List* args);
+        void show(VM* vm, List* args);
 
     }
 }

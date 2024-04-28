@@ -1,4 +1,11 @@
+#include <cassert>
+#include <cstdint>
+
+#include <plx/data/List.hpp>
+#include <plx/vm/VM.hpp>
 #include <plx/literal/PrimitiveFunction.hpp>
+#include <plx/object/HashCode.hpp>
+#include <plx/object/TypeIds.hpp>
 
 namespace PLX {
 
@@ -7,8 +14,31 @@ namespace PLX {
         , _primitive {primitive}
     {}
 
-    Object* PrimitiveFunction::apply(Evaluator* etor, List* arguments) {
-        return _primitive(etor, arguments);
+    class PrimApplyContin : public Object {
+    public:
+        PrimApplyContin(List* arguments)
+            : _arguments {arguments}
+         {}
+        void eval(VM* vm) override {
+            Object* abstractionValue;
+            assert(vm->popObj(abstractionValue));
+            abstractionValue->apply(vm, _arguments);
+        }
+        void markChildren(std::vector<Object*>& objs) override {
+            objs.push_back(_arguments);
+        }
+        void showOn(std::ostream& ostream) const override {
+            ostream << "ApplyContin{}";
+        }
+        TypeId typeId() const override {
+            return TypeId::C_CONTINUATION;
+        }
+    private:
+        List* _arguments;
+    };
+
+    void PrimitiveFunction::apply(VM* vm, List* arguments) {
+        _primitive(vm, arguments);
     }
 
     bool PrimitiveFunction::hashCode(HashCode& hashCode) {

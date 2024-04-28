@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include <test/PlxTestFixture.hpp>
+#include <tests/PlxTestFixture.hpp>
 
 #include <plx/lexer/Lexer.hpp>
 #include <plx/object/Globals.hpp>

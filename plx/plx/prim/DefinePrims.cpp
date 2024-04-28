@@ -1,6 +1,7 @@
 #include <plx/literal/PrimitiveFunction.hpp>
-#include <plx/evaluator/Evaluator.hpp>
+#include <plx/vm/VM.hpp>
 #include <plx/expr/Identifier.hpp>
+#include <plx/object/TypeIds.hpp>
 #include <plx/prim/Array.hpp>
 #include <plx/prim/Data.hpp>
 #include <plx/prim/Global.hpp>
@@ -12,48 +13,50 @@
 
 namespace PLX {
 
-    void definePrim(Evaluator* etor, const std::string& name, Primitive prim) {
-        etor->bind(Identifier::create(name), new PrimitiveFunction(name, prim));
+    void definePrim(VM* vm, const std::string& name, Primitive prim) {
+        vm->bind(Identifier::create(name), new PrimitiveFunction(name, prim));
     }
 
-    void definePrims(Evaluator* etor) {
-        // Global
-        definePrim(etor, "argMap", Prim_Global::argMap);
-        definePrim(etor, "eval", Prim_Global::eval);
-        definePrim(etor, "not", Prim_Global::notOperator);
-        definePrim(etor, "repl", Prim_Global::repl);
-        definePrim(etor, "type", Prim_Global::type);
-        // Array
-        definePrim(etor, "get", Prim_Array::get);
-        definePrim(etor, "set", Prim_Array::set);
-        // Data
-        definePrim(etor, "length", Prim_Data::length);
-        definePrim(etor, "toArray", Prim_Data::toArray);
-        definePrim(etor, "toList", Prim_Data::toList);
-        definePrim(etor, "toQueue", Prim_Data::toQueue);
-        definePrim(etor, "toString", Prim_Data::toString);
-        // HashTable
-        definePrim(etor, "keys", Prim_HashTable::keys);
-        // IO
-        definePrim(etor, "display", Prim_IO::display);
-        definePrim(etor, "nl", Prim_IO::nl);
-        definePrim(etor, "readLine", Prim_IO::readLine);
-        definePrim(etor, "show", Prim_IO::show);
-        // List
-        definePrim(etor, "first", Prim_List::first);
-        definePrim(etor, "rest", Prim_List::rest);
-        // Queue
-        definePrim(etor, "enq", Prim_Queue::enq);
-        definePrim(etor, "deq", Prim_Queue::deq);
-        // Operator
-        definePrim(etor, "=", Prim_Operator::bind);
-        definePrim(etor, "==", Prim_Operator::equalTo);
-        definePrim(etor, "+", Prim_Operator::plus);
-        definePrim(etor, "-", Prim_Operator::minus);
-        definePrim(etor, "*", Prim_Operator::times);
-        definePrim(etor, "/", Prim_Operator::divide);
-        definePrim(etor, ".", Prim_Operator::dot);
-        definePrim(etor, "%", Prim_Operator::percent);
+    void definePrims(VM* vm) {
+        // Prim_Global
+        definePrim(vm, "argMap", Prim_Global::argMap);
+        definePrim(vm, "close", Prim_Global::close);
+        definePrim(vm, "eval", Prim_Global::eval);
+        definePrim(vm, "gc", Prim_Global::gc);
+        definePrim(vm, "not", Prim_Global::notOperator);
+        definePrim(vm, "repl", Prim_Global::repl);
+        definePrim(vm, "type", Prim_Global::type);
+        // Prim_Array
+        definePrim(vm, "get", Prim_Array::get);
+        definePrim(vm, "set", Prim_Array::set);
+        // Prim_Data
+        definePrim(vm, "length", Prim_Data::length);
+        definePrim(vm, "toArray", Prim_Data::toArray);
+        definePrim(vm, "toList", Prim_Data::toList);
+        definePrim(vm, "toQueue", Prim_Data::toQueue);
+        definePrim(vm, "toString", Prim_Data::toString);
+        // Prim_HashTable
+        definePrim(vm, "keys", Prim_HashTable::keys);
+        // Prim_IO
+        definePrim(vm, "display", Prim_IO::display);
+        definePrim(vm, "nl", Prim_IO::nl);
+        definePrim(vm, "readLine", Prim_IO::readLine);
+        definePrim(vm, "show", Prim_IO::show);
+        // Prim_List
+        definePrim(vm, "first", Prim_List::first);
+        definePrim(vm, "rest", Prim_List::rest);
+        // Prim_Queue
+        definePrim(vm, "enq", Prim_Queue::enq);
+        definePrim(vm, "deq", Prim_Queue::deq);
+        // Prim_Operator
+        definePrim(vm, "=", Prim_Operator::bind);
+        definePrim(vm, "==", Prim_Operator::equalTo);
+        definePrim(vm, "+", Prim_Operator::plus);
+        definePrim(vm, "-", Prim_Operator::minus);
+        definePrim(vm, "*", Prim_Operator::times);
+        definePrim(vm, "/", Prim_Operator::divide);
+        definePrim(vm, ".", Prim_Operator::dot);
+        definePrim(vm, "%", Prim_Operator::percent);
     }
 
 }

@@ -1,16 +1,17 @@
 #include <gtest/gtest.h>
 
-#include <test/PlxTestFixture.hpp>
+#include <tests/PlxTestFixture.hpp>
 
 #include <plx/data/Array.hpp>
 #include <plx/data/Triple.hpp>
-#include <plx/evaluator/Evaluator.hpp>
 #include <plx/expr/Identifier.hpp>
 #include <plx/expr/LetIn.hpp>
+#include <plx/gc/GC.hpp>
 #include <plx/literal/Integer.hpp>
 #include <plx/literal/Nil.hpp>
 #include <plx/object/Globals.hpp>
 #include <plx/object/TypeIds.hpp>
+#include <plx/vm/VM.hpp>
 
 namespace PLX {
 
@@ -22,22 +23,23 @@ namespace PLX {
         EXPECT_EQ("LetIn", letIn1->typeName());
     }
 
-    TEST_F(LetIn_Test, Eval_Evaluator) {
+    TEST_F(LetIn_Test, Eval) {
         Identifier* x = Identifier::create("x");
         Integer* i100 = new Integer(100);
         LetIn* letIn1 = new LetIn(new Triple(x, i100), x);
-        Evaluator* etor = new Evaluator();
-        Object* value = etor->evalExpr(letIn1);
+        VM* vm = new VM();
+        Object* value;
+        ASSERT_NO_THROW(value = vm->evalExpr(letIn1));
         EXPECT_EQ(i100, value);
-        EXPECT_THROW(etor->lookup(x), Array*);
+        EXPECT_THROW(vm->lookup(x), Array*);
     }
 
-    TEST_F(LetIn_Test, Eval_MatchFailure_Evaluator) {
-        Evaluator* etor = new Evaluator();
+    TEST_F(LetIn_Test, Eval_MatchFailure) {
+        VM* vm = new VM();
         Integer* i100 = new Integer(100);
         Integer* i200 = new Integer(200);
         LetIn* letIn1 = new LetIn(new Triple(i100, i200), i100);
-        EXPECT_THROW(etor->evalExpr(letIn1), Array*);
+        EXPECT_THROW(vm->evalExpr(letIn1), Array*);
     }
 
     TEST_F(LetIn_Test, MarkChildren) {
@@ -49,7 +51,8 @@ namespace PLX {
         EXPECT_FALSE(x->isMarked());
         EXPECT_FALSE(y->isMarked());
         EXPECT_FALSE(i100->isMarked());
-        letIn1->markChildren();
+        std::vector<Object*> objs{letIn1};
+        GC::mark(objs);
         EXPECT_FALSE(letIn1->isMarked());
         EXPECT_TRUE(x->isMarked());
         EXPECT_TRUE(y->isMarked());

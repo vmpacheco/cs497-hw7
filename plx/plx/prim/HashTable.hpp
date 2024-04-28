@@ -1,12 +1,12 @@
 namespace PLX {
 
-    class Evaluator;
     class List;
     class Object;
+    class VM;
 
     namespace Prim_HashTable {
 
-        Object* keys(Evaluator* etor, List* args);
+        void keys(VM* vm, List* args);
 
     }
 }

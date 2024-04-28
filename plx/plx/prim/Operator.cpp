@@ -5,7 +5,7 @@
 #include <plx/data/List.hpp>
 #include <plx/data/Method.hpp>
 #include <plx/data/Triple.hpp>
-#include <plx/evaluator/Evaluator.hpp>
+#include <plx/vm/VM.hpp>
 #include <plx/expr/Apply.hpp>
 #include <plx/expr/Function.hpp>
 #include <plx/expr/Identifier.hpp>
@@ -29,96 +29,96 @@ namespace PLX {
                 }));
         }
 
-        Object* bind(Evaluator* etor, List* args) {
+        void bind(VM* vm, List* args) {
             static const std::string PRIM_NAME {"/"};
-            List* argValues = evalNArgs(PRIM_NAME, etor, args, {TypeId::Z_ANY, TypeId::Z_ANY});
-            Object* lhs = argValues->first();
-            Object* rhs = argValues->second();
+            checkArgTypes(PRIM_NAME, args, {TypeId::Z_ANY, TypeId::Z_ANY});
+            Object* lhs = args->first();
+            Object* rhs = args->second();
             Triple* binding = new Triple(lhs, rhs);
-            return binding;
+            vm->pushObj(binding);
         }
 
-        Object* divide(Evaluator* etor, List* args) {
+        void divide(VM* vm, List* args) {
             const std::string PRIM_NAME {"/"};
-            List* argValues = evalNArgs(PRIM_NAME, etor, args, {TypeId::Z_ANY, TypeId::Z_ANY});
-            Object* lhs = argValues->first();
-            Object* rhs = argValues->second();
+            checkArgTypes(PRIM_NAME, args, {TypeId::Z_ANY, TypeId::Z_ANY});
+            Object* lhs = args->first();
+            Object* rhs = args->second();
             Object* value;
             if (!lhs->divide(rhs, value)) {
                 operationNotSupported(PRIM_NAME, lhs, rhs);
             }
-            return value;
+            vm->pushObj(value);
         }
 
-        Object* dot(Evaluator* etor, List* args) {
-            (void)etor;
+        void dot(VM* vm, List* args) {
             const std::string PRIM_NAME {"."};
-            int nArgs = args->length();
-            if (nArgs != 2) {
-                argumentCountMismatch(PRIM_NAME, 2, nArgs);
-            }
+            checkArgTypes(PRIM_NAME, args, {TypeId::Z_ANY, TypeId::Z_ANY});
             Object* lhs = args->first();
             Object* rhs = args->second();
-            assert(rhs->typeId() == TypeId::E_IDENTIFIER);
+            if (!rhs->isA(TypeId::E_IDENTIFIER)) {
+                std::clog << "Operator::dot lhs = " << lhs << ", rhs = " << rhs << "\n";
+                assert(rhs->isA(TypeId::E_IDENTIFIER));
+            }
             Identifier* rhsIdent = static_cast<Identifier*>(rhs);
             Method* method = new Method(lhs, rhsIdent);
-            return method;
+            vm->pushObj(method);
         }
 
-        Object* equalTo(Evaluator* etor, List* args) {
+        void equalTo(VM* vm, List* args) {
             const std::string PRIM_NAME = "==";
-            List* argVals = evalNArgs(PRIM_NAME, etor, args, {TypeId::Z_ANY, TypeId::Z_ANY});
-            Object* lhs = argVals->first();
-            Object* rhs = argVals->second();
-            return (*lhs == *rhs) ? GLOBALS->True() : GLOBALS->False();
+            checkArgTypes(PRIM_NAME, args, {TypeId::Z_ANY, TypeId::Z_ANY});
+            Object* lhs = args->first();
+            Object* rhs = args->second();
+            vm->pushObj((*lhs == *rhs) ? GLOBALS->True() : GLOBALS->False());
         }
 
-        Object* minus(Evaluator* etor, List* args) {
+        void minus(VM* vm, List* args) {
             const std::string PRIM_NAME {"-"};
-            List* argValues = evalNArgs(PRIM_NAME, etor, args, {TypeId::Z_ANY, TypeId::Z_ANY});
-            Object* lhs = argValues->first();
-            Object* rhs = argValues->second();
+            checkArgTypes(PRIM_NAME, args, {TypeId::Z_ANY, TypeId::Z_ANY});
+            Object* lhs = args->first();
+            Object* rhs = args->second();
             Object* value;
             if (!lhs->minus(rhs, value)) {
                 operationNotSupported(PRIM_NAME, lhs, rhs);
             }
-            return value;
+            vm->pushObj(value);
         }
 
-        Object* plus(Evaluator* etor, List* args) {
+        void plus(VM* vm, List* args) {
             static const std::string PRIM_NAME {"+"};
-            List* argValues = evalNArgs(PRIM_NAME, etor, args, {TypeId::Z_ANY, TypeId::Z_ANY});
-            Object* lhs = argValues->first();
-            Object* rhs = argValues->second();
+            checkArgTypes(PRIM_NAME, args, {TypeId::Z_ANY, TypeId::Z_ANY});
+            Object* lhs = args->first();
+            Object* rhs = args->second();
             Object* value;
             if (!lhs->plus(rhs, value)) {
                 operationNotSupported(PRIM_NAME, lhs, rhs);
             }
-            return value;
+            // std::clog << "Operator::plus got value " << value << ", pushing onto ostack\n";
+            vm->pushObj(value);
         }
 
-        Object* percent(Evaluator* etor, List* args) {
+        void percent(VM* vm, List* args) {
             static const std::string PRIM_NAME {"+"};
-            List* argValues = evalNArgs(PRIM_NAME, etor, args, {TypeId::Z_ANY, TypeId::Z_ANY});
-            Object* lhs = argValues->first();
-            Object* rhs = argValues->second();
+            checkArgTypes(PRIM_NAME, args, {TypeId::Z_ANY, TypeId::Z_ANY});
+            Object* lhs = args->first();
+            Object* rhs = args->second();
             Object* value;
             if (!lhs->percent(rhs, value)) {
                 operationNotSupported(PRIM_NAME, lhs, rhs);
             }
-            return value;
+            vm->pushObj(value);
         }
 
-        Object* times(Evaluator* etor, List* args) {
+        void times(VM* vm, List* args) {
             const std::string PRIM_NAME {"*"};
-            List* argValues = evalNArgs(PRIM_NAME, etor, args, {TypeId::Z_ANY, TypeId::Z_ANY});
-            Object* lhs = argValues->first();
-            Object* rhs = argValues->second();
+            checkArgTypes(PRIM_NAME, args, {TypeId::Z_ANY, TypeId::Z_ANY});
+            Object* lhs = args->first();
+            Object* rhs = args->second();
             Object* value;
             if (!lhs->times(rhs, value)) {
                 operationNotSupported(PRIM_NAME, lhs, rhs);
             }
-            return value;
+            vm->pushObj(value);
         }
 
     }

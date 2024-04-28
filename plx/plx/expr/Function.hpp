@@ -21,12 +21,15 @@ namespace PLX {
 
         // Overridden functions --------------------------------------------
 
-        Object* eval(Evaluator* etor) override;
-        void markChildren() override;
+        void apply(VM* vm, List* arguments) override;
+        Object* close(Triple* env) override;
+        void eval(VM* vm) override;
+        void markChildren(std::vector<Object*>& objs) override;
         void showOn(std::ostream& ostream) const override;
         TypeId typeId() const override;
 
         friend class NamedFunction;
+        friend class FunctionApplyContin;
 
     private:
         List* _parameters;

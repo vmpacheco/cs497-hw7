@@ -1,10 +1,11 @@
 #include <gtest/gtest.h>
 
-#include <test/PlxTestFixture.hpp>
+#include <tests/PlxTestFixture.hpp>
 
 #include <plx/data/HashTable.hpp>
 #include <plx/data/Triple.hpp>
-#include <plx/evaluator/Evaluator.hpp>
+#include <plx/vm/VM.hpp>
+#include <plx/vm/VM.hpp>
 #include <plx/expr/Identifier.hpp>
 #include <plx/literal/Integer.hpp>
 #include <plx/object/TypeIds.hpp>
@@ -19,8 +20,7 @@ namespace PLX {
         EXPECT_EQ("Identifier", identifier1->typeName());
         Identifier* identifier2 = Identifier::create("Abc");
         // This asserts that both identifiers are the same object
-        std::cerr << "Identifier_Test " << (void*)identifier1 << ", " << (void*)identifier2 << "\n";
-        ASSERT_EQ(identifier1, identifier2);
+        ASSERT_EQ(static_cast<void*>(identifier1), static_cast<void*>(identifier2));
         HashCode hashCode1;
         EXPECT_TRUE(identifier1->hashCode(hashCode1));
         HashCode hashCode2;
@@ -35,19 +35,20 @@ namespace PLX {
         EXPECT_NE(hashCode2, hashCode3);
     }
 
-    TEST_F(Identifier_Test, Eval_Evaluator) {
-        Evaluator* etor = new Evaluator();
+    TEST_F(Identifier_Test, Eval) {
+        VM* vm = new VM();
         Identifier* abc = Identifier::create("abc");
         Integer* i100 = new Integer(100);
-        etor->bind(abc, i100);
-        Object* value = etor->evalExpr(abc);
+        vm->bind(abc, i100);
+        vm->pushExpr(abc);
+        Object* value = vm->run();
         EXPECT_EQ(i100, value);
     }
 
     TEST_F(Identifier_Test, EvalUnbound) {
-        Evaluator* etor = new Evaluator();
+        VM* vm = new VM();
         Identifier* abc = Identifier::create("abc");
-        EXPECT_THROW(etor->evalExpr(abc), Array*);
+        EXPECT_THROW(vm->evalExpr(abc), Array*);
     }
 
     TEST_F(Identifier_Test, Match) {

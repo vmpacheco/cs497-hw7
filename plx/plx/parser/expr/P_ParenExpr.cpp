@@ -1,4 +1,6 @@
 #include <plx/expr/ParenExpr.hpp>
+#include <plx/object/Object.hpp>
+#include <plx/parser/P_SpecialChars.hpp>
 #include <plx/parser/P_Primitive.hpp>
 #include <plx/parser/P_SpecialChars.hpp>
 

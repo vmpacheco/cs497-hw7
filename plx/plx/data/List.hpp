@@ -1,12 +1,14 @@
 #pragma once
 
 #include <list>
+#include <vector>
 
 #include <plx/object/Object.hpp>
 
 namespace PLX {
 
     class Array;
+    class VM;
 
     class List : public Object {
     public:
@@ -31,15 +33,16 @@ namespace PLX {
         void setRest(Object* rest);
         void showOnWith(std::ostream& ostream, const std::string& open, const std::string& sep, const std::string& close) const;
 
-        // Overloaded functions --------------------------------------------
+        // Overidden functions ---------------------------------------------
 
         bool boolValue() const override;
+        Object* close(Triple* env) override;
         bool equals(const Object* other) const override;
-        Object* eval(Evaluator* etor) override;
+        void eval(VM* vm) override;
         List* freeVars(List* freeVars) override;
         bool hashCode(HashCode& hashCode) override;
         bool length(int& len) override;
-        void markChildren() override;
+        void markChildren(std::vector<Object*>& objs) override;
         bool match(Object* other, Triple*& bindings) override;
         void showOn(std::ostream& ostream) const override;
         bool toArray(Array*& array) override;

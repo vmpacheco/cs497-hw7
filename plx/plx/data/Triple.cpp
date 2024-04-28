@@ -1,9 +1,14 @@
 #include <cassert>
 
+#include <plx/data/Array.hpp>
 #include <plx/data/Triple.hpp>
-#include <plx/evaluator/Evaluator.hpp>
+#include <plx/vm/VM.hpp>
 #include <plx/literal/Nil.hpp>
+#include <plx/literal/String.hpp>
+#include <plx/object/Globals.hpp>
+#include <plx/object/Object.hpp>
 #include <plx/object/ThrowException.hpp>
+#include <plx/object/TypeIds.hpp>
 
 namespace PLX {
 
@@ -36,16 +41,38 @@ namespace PLX {
         return _key->equals(othertriple->_key) && _value->equals(othertriple->_value);
     }
 
-    Object* Triple::eval(Evaluator* etor) {
-        if (isEmpty()) {
-            return this;
+    class TripleContin : public Object {
+    public:
+        TripleContin() {}
+        void eval(VM* vm) override {
+            Object* key;
+            assert(vm->popObj(key));
+            Object* value;
+            assert(vm->popObj(value));
+            Object* next;
+            assert(vm->popObj(next));
+            assert(next->isA(TypeId::D_TRIPLE));
+            Triple* nextTriple = static_cast<Triple*>(next);
+            Triple* newTriple = new Triple(key, value, nextTriple);
+            vm->pushObj(newTriple);
         }
-        Object* keyVal = etor->evalExpr(_key);
-        Object* valueVal = etor->evalExpr(_value);
-        Object* nextValObj = etor->evalExpr(_next);
-        assert(nextValObj->isA(TypeId::D_TRIPLE));
-        Triple* nextVal = static_cast<Triple*>(nextValObj);
-        return new Triple(keyVal, valueVal, nextVal);
+        void showOn(std::ostream& ostream) const override {
+            ostream << "TripleContin{}";
+        }
+        TypeId typeId() const override {
+            return TypeId::C_CONTINUATION;
+        }
+    };
+
+    void Triple::eval(VM* vm) {
+        if (isEmpty()) {
+            vm->pushObj(this);
+            return;
+        }
+        vm->pushExpr(new TripleContin());
+        vm->pushExpr(_key);
+        vm->pushExpr(_value);
+        vm->pushExpr(_next);
     }
 
     bool Triple::isEmpty() const {
@@ -94,10 +121,16 @@ namespace PLX {
         return _next;
     }
 
-    void Triple::markChildren() {
-        _key->mark();
-        _value->mark();
-        _next->mark();
+    void Triple::markChildren(std::vector<Object*>& objs) {
+        Triple* triple = this;
+        while (!triple->isEmpty()) {
+            objs.push_back(triple->_key);
+            objs.push_back(triple->_value);
+            triple = triple->_next;
+            if (triple->setMark(true)) {
+                break;
+            }
+        }
     }
 
     bool Triple::matchLocate(Object* object, Object*& value, Triple*& env) {
