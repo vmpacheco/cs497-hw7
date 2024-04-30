@@ -11,6 +11,7 @@ namespace PLX {
         void gc(VM* vm, List* args);
         void notOperator(VM* vm, List* args);
         void repl(VM* vm, List* args);
+        void tokenize(VM* vm, List* args);
         void type(VM* vm, List* args);
     }
 

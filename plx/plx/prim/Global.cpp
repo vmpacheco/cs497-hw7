@@ -2,13 +2,15 @@
 
 #include <plx/data/HashTable.hpp>
 #include <plx/data/List.hpp>
-#include <plx/vm/VM.hpp>
+#include <plx/lexer/Lexer.hpp>
 #include <plx/literal/Boolean.hpp>
 #include <plx/literal/Nil.hpp>
+#include <plx/literal/String.hpp>
 #include <plx/literal/Symbol.hpp>
 #include <plx/object/Globals.hpp>
 #include <plx/object/Object.hpp>
 #include <plx/prim/Primitive.hpp>
+#include <plx/vm/VM.hpp>
 
 namespace PLX {
     namespace Prim_Global {
@@ -59,21 +61,19 @@ namespace PLX {
             vm->pushObj(GLOBALS->NilObject());
         }
 
-#if 0
-        Object* tokenize(Evaluator* etor, List* args) {
+        void tokenize(VM* vm, List* args) {
             const std::string PRIM_NAME = "tokenize";
-            List* argVals = evalNArgs(PRIM_NAME, etor, args, {TypeId::L_STRING});
-            String* string = static_cast<String*>(argVals->first());
-            ReadEvalPrint* rep = etor->getRep();
-            List* tokenList;
+            checkArgTypes(PRIM_NAME, args, {TypeId::L_STRING});
+            String* string = static_cast<String*>(args->first());
+            Lexer* lexer = new Lexer();
+            List* tokens;
             Object* error;
-            if (!rep->tokenizeString(string->value(), tokenList, error)) {
+            if (!lexer->tokenize(string->value(), tokens, error)) {
                 // TODO What's supposed to happen here?
                 assert(false);
             }
-            return tokenList;
+            vm->pushObj(tokens);
         }
-#endif
 
         void type(VM* vm, List* args) {
             const std::string PRIM_NAME = "type";

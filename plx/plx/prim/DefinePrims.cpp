@@ -25,6 +25,7 @@ namespace PLX {
         definePrim(vm, "gc", Prim_Global::gc);
         definePrim(vm, "not", Prim_Global::notOperator);
         definePrim(vm, "repl", Prim_Global::repl);
+        definePrim(vm, "tokenize", Prim_Global::tokenize);
         definePrim(vm, "type", Prim_Global::type);
         // Prim_Array
         definePrim(vm, "get", Prim_Array::get);
