@@ -79,6 +79,7 @@ namespace PLX {
     }
 
     void GC::mark(std::vector<Object*>& objs) {
+        // Bugged based on Do and If tests
         while (!objs.empty()) {
             Object* toMark = objs.back();
             toMark->mark(objs);
