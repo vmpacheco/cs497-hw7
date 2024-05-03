@@ -87,9 +87,13 @@ namespace PLX {
     }
 
     void GC::sweep() {
+        // currently throws segmentation fault
+        // instructions need to be updated
         for (Object* currObj : _spine) {
             if (currObj->isMarked()) {
                 currObj->setMark(false);
+            // currently operating under assumption that the second
+            // bullet point was meant to say unmarked
             } else if (!currObj->isMarked()) {
                 _spine.remove(currObj);
                 _dispose(currObj);
