@@ -72,16 +72,29 @@ namespace PLX {
     }
 
     void GC::mark() {
-        // TODO
+        std::vector<Object*> objs;
+        for (Object* currObj : _rootObjects) {
+            currObj->mark(objs);
+        }
     }
 
     void GC::mark(std::vector<Object*>& objs) {
-        (void)objs;
-        // TODO
+        while (!objs.empty()) {
+            Object* toMark = objs.back();
+            toMark->mark(objs);
+            objs.pop_back();
+        }
     }
 
     void GC::sweep() {
-        // TODO
+        for (Object* currObj : _spine) {
+            if (currObj->isMarked()) {
+                currObj->setMark(false);
+            } else if (!currObj->isMarked()) {
+                _spine.remove(currObj);
+                _dispose(currObj);
+            }
+        }
     }
 
     int GC::nPermanent() {
