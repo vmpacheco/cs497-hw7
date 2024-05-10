@@ -103,6 +103,10 @@ namespace PLX {
             it++;
         }
 
+        // for whatever reason, the above doesn't unmark
+        // all marked objects, but everything left should
+        // be marked. rather just loop through again than
+        // figure out the logic at this point.
         for (Object* obj : _spine) {
             obj->setMark(false);
         }
