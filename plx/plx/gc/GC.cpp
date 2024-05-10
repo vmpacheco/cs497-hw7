@@ -102,6 +102,10 @@ namespace PLX {
             }
             it++;
         }
+
+        for (Object* obj : _spine) {
+            obj->setMark(false);
+        }
     }
 
     int GC::nPermanent() {
