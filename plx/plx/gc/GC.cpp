@@ -1,6 +1,7 @@
 #include <cassert>
 #include <iostream>
 #include <vector>
+#include <algorithm>
 
 #include <plx/data/Triple.hpp>
 #include <plx/expr/Identifier.hpp>
@@ -76,29 +77,30 @@ namespace PLX {
         for (Object* currObj : _rootObjects) {
             currObj->mark(objs);
         }
+
+        mark(objs);
     }
 
     void GC::mark(std::vector<Object*>& objs) {
-        // Bugged based on Do and If tests
         while (!objs.empty()) {
             Object* toMark = objs.back();
-            toMark->mark(objs);
             objs.pop_back();
+            toMark->mark(objs);
+            toMark->setMark(true);
         }
     }
 
     void GC::sweep() {
-        // currently throws segmentation fault
-        // instructions need to be updated
-        for (Object* currObj : _spine) {
+        auto it = _spine.begin();
+        while (it != _spine.end()) {
+            Object* currObj = *it;
             if (currObj->isMarked()) {
                 currObj->setMark(false);
-            // currently operating under assumption that the second
-            // bullet point was meant to say unmarked
-            } else if (!currObj->isMarked()) {
-                _spine.remove(currObj);
+            } else {
+                it = _spine.erase(it);
                 _dispose(currObj);
             }
+            it++;
         }
     }
 
